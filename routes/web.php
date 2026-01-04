@@ -1,0 +1,98 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use Inertia\Inertia;
+
+use App\Http\Controllers\{
+    CompanyController,
+    DashboardController,
+    CustomerController,
+    FeedbackController,
+    FeedbackRequestController,
+    ProfileController
+};
+
+/*
+|--------------------------------------------------------------------------
+| Public routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin'       => Route::has('login'),
+        'canRegister'    => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion'     => PHP_VERSION,
+    ]);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Feedback public (clients)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/feedback/{token}', [FeedbackController::class, 'show'])
+    ->name('feedback.show');
+
+Route::post('/feedback/{token}', [FeedbackController::class, 'store'])
+    ->name('feedback.store');
+
+ Route::get('/feedbacks/{id}', [FeedbackController::class, 'adminShow'])
+        ->name('feedback.adminShow');
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    /*
+    | Dashboard
+    */
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    /*
+    | Profile
+    */
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    /*
+    | Customers
+    */
+    Route::get('/customers', [CustomerController::class, 'index'])
+        ->name('customers.index');
+
+    Route::get('/customers/create', [CustomerController::class, 'create'])
+        ->name('customers.create');
+
+    Route::post('/customers', [CustomerController::class, 'store'])
+        ->name('customers.store');
+    Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])
+    ->name('customers.destroy');
+
+
+    Route::post('/customers/import-csv', [CustomerController::class, 'importCSV'])
+        ->name('customers.importCSV');
+
+    Route::get('/company/settings', [CompanyController::class, 'edit'])
+        ->name('company.edit');
+
+    Route::put('/company/settings', [CompanyController::class, 'update'])
+        ->name('company.update');
+
+    /*
+    | Feedback requests (send / resend)
+    */
+    Route::post('/feedback-requests', [FeedbackRequestController::class, 'store'])
+        ->name('feedback-requests.store');
+});
+
+require __DIR__.'/auth.php';
