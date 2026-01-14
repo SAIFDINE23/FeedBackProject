@@ -39,6 +39,7 @@ class DashboardController extends Controller
     ->get()
     ->map(fn ($f) => [
     'id' => $f->id,
+    'feedback_id' => $f->feedback?->id,
     'token' => $f->token, // ✅ AJOUT OBLIGATOIRE
     'customer' => [
         'id' => $f->customer->id,

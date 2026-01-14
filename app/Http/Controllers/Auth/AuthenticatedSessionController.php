@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthenticatedSessionController extends Controller
 {
@@ -27,14 +29,27 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
-    {
+
+public function store(LoginRequest $request): RedirectResponse
+{
+    Log::info('Tentative de login pour : '.$request->email);
+
+    try {
         $request->authenticate();
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        Log::info('Authentification réussie pour : '.$request->email);
+    } catch (\Exception $e) {
+        Log::error('Erreur d\'authentification : '.$e->getMessage());
+        return back()->withErrors([
+            'email' => 'Identifiants incorrects ou problème de session.',
+        ]);
     }
+
+    // Regénérer la session
+    $request->session()->regenerate();
+    Log::info('Session ID après login : '.$request->session()->getId());
+
+    return redirect()->intended(route('dashboard', absolute: false));
+}
 
     /**
      * Destroy an authenticated session.

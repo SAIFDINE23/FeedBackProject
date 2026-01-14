@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 
-export default function Create({ token, company, customer }) {
+export default function Create({ token, postUrl, company, customer }) {
     const { data, setData, post, processing, errors } = useForm({
         rating: 5,
         comment: '',
@@ -8,7 +8,7 @@ export default function Create({ token, company, customer }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(`/feedback/${token}`);
+        post(postUrl);
     };
 
     return (

@@ -34,7 +34,7 @@ return new class extends Migration
         'responded'
     ])->default('pending');
 
-    // SMS tracking
+    // Tracking provider (SMS / WhatsApp)
     $table->string('provider')->nullable();
     $table->string('provider_message_id')->nullable();
     $table->text('provider_response')->nullable();
@@ -43,7 +43,12 @@ return new class extends Migration
     $table->timestamp('responded_at')->nullable();
 
     $table->timestamps();
+
+    // Index dashboard
+    $table->index(['company_id', 'status']);
+    $table->index('channel');
 });
+
 
     }
 

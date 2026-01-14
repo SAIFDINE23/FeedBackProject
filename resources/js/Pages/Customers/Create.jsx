@@ -11,7 +11,6 @@ export default function Create({ auth }) {
         name: '',
         email: '',
         phone: '',
-        method: 'email',
         csv_file: null,
     });
 
@@ -178,28 +177,11 @@ export default function Create({ auth }) {
                                                 value={data.phone}
                                                 onChange={(e) => setData('phone', e.target.value)}
                                                 className="block w-full pl-10"
-                                                placeholder="+212 6XX XX XX XX"
+                                                placeholder="+33 6 XX XX XX XX"
                                             />
                                         </div>
                                         <InputError message={errors.phone} className="mt-2" />
-                                        <p className="mt-1 text-xs text-gray-500">Requis uniquement pour les envois par SMS</p>
-                                    </div>
-
-                                    <div>
-                                        <InputLabel htmlFor="method" value="Méthode d'envoi préférée" />
-                                        <select
-                                            id="method"
-                                            value={data.method}
-                                            onChange={(e) => setData('method', e.target.value)}
-                                            className="mt-2 w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        >
-                                            <option value="email">📧 Email</option>
-                                            <option value="sms">📱 SMS</option>
-                                            <option value="qr">📷 QR Code</option>
-                                        </select>
-                                        <p className="mt-1 text-xs text-gray-500">
-                                            Choisissez comment vous souhaitez envoyer les demandes de feedback
-                                        </p>
+                                        <p className="mt-1 text-xs text-gray-500">Requis pour les envois par SMS ou WhatsApp</p>
                                     </div>
 
                                     <div className="flex items-center justify-between pt-6 border-t border-gray-200">
@@ -309,7 +291,7 @@ export default function Create({ auth }) {
                                     <div className="bg-gray-50 rounded-lg p-4">
                                         <h4 className="text-sm font-semibold text-gray-700 mb-2">Exemple de fichier CSV :</h4>
                                         <pre className="text-xs bg-white p-3 rounded border border-gray-200 overflow-x-auto">
-                                            <code>name,email,phone{'\n'}Jean Dupont,jean@example.com,+212 600000000{'\n'}Marie Martin,marie@example.com,+212 611111111</code>
+                                            <code>name,email,phone{'\n'}Jean Dupont,jean@example.com,+33 6 12 34 56 78{'\n'}Marie Martin,marie@example.com,+33 6 98 76 54 32</code>
                                         </pre>
                                     </div>
 
@@ -363,13 +345,19 @@ export default function Create({ auth }) {
                                 <svg className="w-4 h-4 mr-2 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                <span>Le numéro de téléphone est requis uniquement pour les envois par SMS</span>
+                                <span>Le numéro de téléphone est requis uniquement pour les envois par SMS ou WhatsApp</span>
                             </li>
                             <li className="flex items-start">
                                 <svg className="w-4 h-4 mr-2 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
                                 <span>Vous pouvez importer plusieurs clients simultanément via un fichier CSV</span>
+                            </li>
+                            <li className="flex items-start">
+                                <svg className="w-4 h-4 mr-2 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
+                                <span>Le canal d'envoi sera choisi lors de l'envoi de la demande de feedback</span>
                             </li>
                         </ul>
                     </div>

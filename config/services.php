@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'twilio' => [
+    'sid'   => env('TWILIO_SID'),
+    'token' => env('TWILIO_AUTH_TOKEN'),
+    'from'  => env('TWILIO_FROM'),
+],
+'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL'),
+    ],
+
+
 ];

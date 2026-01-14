@@ -138,13 +138,21 @@ function Rating({ value }) {
 function FeedbackAction({ feedback }) {
     if (feedback.status === 'completed') {
         return (
-            <Link href={route('feedback.show', feedback.token)} className="text-green-600">
-                Voir
-            </Link>
+            <div className="flex items-center gap-2">
+                <Link href={route('feedback.adminShow', feedback.id)} className="text-green-600">
+                    Voir
+                </Link>
+
+                {/* Nouveau bouton pour répondre */}
+                <Link href={route('feedback.replies.index', feedback.feedback_id)} className="text-blue-600">
+                    Répondre
+                </Link>
+            </div>
         );
     }
     return <span className="text-gray-400">—</span>;
 }
+
 
 /* ---------------- ICONS ---------------- */
 const PlusIcon = () => <span>＋</span>;

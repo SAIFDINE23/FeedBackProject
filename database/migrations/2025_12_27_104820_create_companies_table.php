@@ -27,8 +27,9 @@ return new class extends Migration
 
     $table->timestamps();
 
-    $table->unique('user_id'); // 1 user = 1 company (V1)
+    $table->unique('user_id'); // V1 : 1 user = 1 company
 });
+
 
     }
 

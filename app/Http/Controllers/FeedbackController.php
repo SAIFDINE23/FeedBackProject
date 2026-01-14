@@ -5,72 +5,93 @@ namespace App\Http\Controllers;
 use App\Models\Feedback;
 use App\Models\FeedbackRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class FeedbackController extends Controller
 {
-    // Pour le client
-public function show(string $token)
-{
-    $feedbackRequest = FeedbackRequest::where('token', $token)->firstOrFail();
+    /**
+     * Page feedback (client – via token)
+     */
+    public function show(string $token)
+    {
+        $feedbackRequest = FeedbackRequest::with('company', 'customer')
+            ->where('token', $token)
+            ->firstOrFail();
 
-    if ($feedbackRequest->status === 'completed') {
-        return Inertia::render('Feedback/Show', [
-            'feedback' => $feedbackRequest->feedback,
-            'status' => 'completed',
+        if ($feedbackRequest->status === 'completed') {
+            return Inertia::render('Feedback/AlreadySubmitted', [
+                'company' => $feedbackRequest->company->name,
+            ]);
+        }
+
+        return Inertia::render('Feedback/Create', [
+            'token'   => $token,
+            'postUrl' => route('feedback.store', $token),
             'company' => $feedbackRequest->company->name,
-            'customer' => optional($feedbackRequest->customer)->name,
+            'customer'=> optional($feedbackRequest->customer)->name,
         ]);
     }
 
-    return Inertia::render('Feedback/Show', [
-        'token' => $token,
-        'status' => 'pending',
-        'company' => $feedbackRequest->company->name,
-        'customer' => optional($feedbackRequest->customer)->name,
-    ]);
-}
-
-// Pour l’admin
-public function adminShow(int $id)
-{
-    $feedbackRequest = FeedbackRequest::with('feedback', 'customer', 'company')
-        ->findOrFail($id);
-
-    return Inertia::render('Feedback/ShowAdmin', [
-        'feedback' => $feedbackRequest->feedback,
-        'status' => $feedbackRequest->status,
-        'company' => $feedbackRequest->company->name,
-        'customer' => optional($feedbackRequest->customer)->name,
-    ]);
-}
-
-
+    /**
+     * Soumission du feedback
+     */
     public function store(Request $request, string $token)
     {
         $request->validate([
-        'rating' => ['required', 'integer', 'between:1,5'],
-        'comment' => ['nullable', 'string'],
-    ]);
+            'rating'  => ['required', 'integer', 'between:1,5'],
+            'comment' => ['nullable', 'string'],
+        ]);
 
-    $feedbackRequest = FeedbackRequest::where('token', $token)
-        ->where('status', '!=', 'completed')
-        ->firstOrFail();
+        $feedbackRequest = FeedbackRequest::with('company')
+            ->where('token', $token)
+            ->where('status', '!=', 'completed')
+            ->firstOrFail();
 
-    // ✅ Création du feedback (CE QUI MANQUAIT)
-    Feedback::create([
-        'feedback_request_id' => $feedbackRequest->id,
-        'rating' => $request->rating,
-        'comment' => $request->comment,
-        'is_public' => true,
-    ]);
+        // ✅ Création du feedback
+        $feedback = Feedback::create([
+            'feedback_request_id' => $feedbackRequest->id,
+            'rating'              => $request->rating,
+            'comment'             => $request->comment,
+            'is_public'           => true,
+        ]);
 
-    // ✅ Mise à jour du statut
-    $feedbackRequest->update([
-        'status' => 'completed',
-        'responded_at' => now(),
-    ]);
+        // ✅ Update request
+        $feedbackRequest->update([
+            'status'        => 'completed',
+            'responded_at'  => now(),
+        ]);
 
-        return Inertia::render('Feedback/ThankYou');
+        // ✅ Logique Google Reviews
+        $googleUrl = null;
+
+        if ($feedback->rating >= 4) {
+            $googleUrl = $feedbackRequest->company->google_review_url;
+        }
+
+        return Inertia::render('Feedback/ThankYou', [
+            'rating'    => $feedback->rating,
+            'googleUrl' => $googleUrl,
+            'company'   => $feedbackRequest->company->name,
+        ]);
+    }
+
+    /**
+     * Admin view
+     */
+    public function adminShow(int $id)
+    {
+        $feedbackRequest = FeedbackRequest::with('feedback', 'customer', 'company')
+            ->findOrFail($id);
+
+        return Inertia::render('Feedback/Show', [
+            'token'    => $feedbackRequest->token,
+            'feedback' => $feedbackRequest->feedback,
+            'status'   => $feedbackRequest->status,
+            'company'  => $feedbackRequest->company->name,
+            'customer' => optional($feedbackRequest->customer)->name,
+            'isAdmin'  => Auth::check(), 
+        // ou Auth::user()?->is_admin si tu as un champ
+        ]);
     }
 }

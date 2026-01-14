@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "@inertiajs/react": "^2.3.4",
-        "@tailwindcss/vite": "^4.1.18"
+        "@tailwindcss/vite": "^4.1.18",
+        "lucide-react": "^0.562.0"
     }
 }

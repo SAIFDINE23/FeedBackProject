@@ -16,6 +16,8 @@ class CompanyController extends Controller
         ]);
     }
 
+    
+
     public function update(Request $request)
     {
         $validated = $request->validate([

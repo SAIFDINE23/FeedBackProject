@@ -17,7 +17,7 @@ class FeedbackRequestMail extends Mailable
 
     public function build()
     {
-        $link = config('app.url') . '/feedback/' . $this->feedbackRequest->token;
+         $link = route('feedback.show', $this->feedbackRequest->token, true);
 
         return $this
             ->subject('We value your feedback')

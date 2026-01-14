@@ -25,5 +25,11 @@ class Feedback extends Model
     {
         return $this->belongsTo(FeedbackRequest::class);
     }
+
+    public function replies()
+    {
+        return $this->hasMany(FeedbackReply::class);
+    }
+
 }
 

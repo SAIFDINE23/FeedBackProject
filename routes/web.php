@@ -10,8 +10,10 @@ use App\Http\Controllers\{
     CustomerController,
     FeedbackController,
     FeedbackRequestController,
-    ProfileController
+    ProfileController,
+    FeedbackReplyController
 };
+use App\Services\SmsService;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,9 +42,6 @@ Route::get('/feedback/{token}', [FeedbackController::class, 'show'])
 Route::post('/feedback/{token}', [FeedbackController::class, 'store'])
     ->name('feedback.store');
 
- Route::get('/feedbacks/{id}', [FeedbackController::class, 'adminShow'])
-        ->name('feedback.adminShow');
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated routes
@@ -50,6 +49,25 @@ Route::post('/feedback/{token}', [FeedbackController::class, 'store'])
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/feedbacks/{id}', [FeedbackController::class, 'adminShow'])
+        ->name('feedback.adminShow');
+
+    // Liste des réponses pour un feedback
+    Route::get('/feedback/{id}/replies', [FeedbackReplyController::class, 'index'])
+        ->name('feedback.replies.index');
+
+    // Création d'une réponse manuelle
+    Route::post('/feedback/{id}/replies', [FeedbackReplyController::class, 'store'])
+        ->name('feedback.replies.store');
+
+    // Génération IA d'une réponse
+    Route::post('/feedback/{id}/replies/ai', [FeedbackReplyController::class, 'generateAIReply'])
+        ->name('feedback.replies.ai');
+
+    // Génération IA synchrone (retourne le contenu généré en JSON)
+    Route::post('/feedback/{id}/replies/ai/generate', [FeedbackReplyController::class, 'generateAIReplySync'])
+        ->name('feedback.replies.ai.generate');
 
     /*
     | Dashboard
@@ -94,5 +112,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/feedback-requests', [FeedbackRequestController::class, 'store'])
         ->name('feedback-requests.store');
 });
+
+
+
 
 require __DIR__.'/auth.php';

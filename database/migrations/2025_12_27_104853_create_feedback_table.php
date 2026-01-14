@@ -21,11 +21,14 @@ return new class extends Migration
     $table->unsignedTinyInteger('rating'); // 1–5
     $table->text('comment')->nullable();
 
-    // Filtrage
     $table->boolean('is_public')->default(false);
 
     $table->timestamps();
+
+    // Analytics
+    $table->index('rating');
 });
+
 
     }
 
