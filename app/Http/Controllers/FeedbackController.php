@@ -11,6 +11,40 @@ use Inertia\Inertia;
 class FeedbackController extends Controller
 {
     /**
+     * Liste de tous les feedbacks (admin)
+     */
+    public function index()
+    {
+        $company = Auth::user()->company;
+
+        $feedbacks = FeedbackRequest::where('company_id', $company->id)
+            ->whereHas('customer')
+            ->with(['customer', 'feedback'])
+            ->latest()
+            ->paginate(15)
+            ->through(fn ($f) => [
+                'id' => $f->id,
+                'feedback_id' => $f->feedback?->id,
+                'token' => $f->token,
+                'customer' => [
+                    'id' => $f->customer->id,
+                    'name' => $f->customer->name,
+                ],
+                'status' => $f->status,
+                'feedback' => [
+                    'id' => $f->feedback?->id,
+                    'rating' => $f->feedback?->rating,
+                    'comment' => $f->feedback?->comment,
+                ],
+                'created_at' => $f->created_at->format('Y-m-d H:i'),
+            ]);
+
+        return Inertia::render('Feedbacks/Index', [
+            'feedbacks' => $feedbacks,
+        ]);
+    }
+
+    /**
      * Page feedback (client – via token)
      */
     public function show(string $token)

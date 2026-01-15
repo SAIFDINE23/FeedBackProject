@@ -9,7 +9,7 @@ export default function AuthenticatedLayout({ user, header, children }) {
         { name: 'Clients', href: 'customers.index', icon: UsersIcon, current: route().current('customers.*'), enabled: true },
         { name: 'Ajouter un client', href: 'customers.create', icon: UserPlusIcon, current: route().current('customers.create'), enabled: true },
         { name: 'Entreprise', href: 'company.edit', icon: BuildingIcon, current: route().current('company.*'), enabled: true },
-        { name: 'Feedbacks', href: '#', icon: ChatIcon, current: false, enabled: false },
+        { name: 'Feedbacks', href: 'feedbacks.index', icon: ChatIcon, current: route().current('feedbacks.*'), enabled: true },
         { name: 'Analytics', href: '#', icon: ChartIcon, current: false, enabled: false },
         { name: 'Paramètres', href: '#', icon: SettingsIcon, current: false, enabled: false },
     ];

@@ -50,6 +50,10 @@ Route::post('/feedback/{token}', [FeedbackController::class, 'store'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // Liste de tous les feedbacks
+    Route::get('/feedbacks', [FeedbackController::class, 'index'])
+        ->name('feedbacks.index');
+
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'adminShow'])
         ->name('feedback.adminShow');
 
