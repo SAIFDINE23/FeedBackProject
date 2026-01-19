@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useForm, Head, Link } from '@inertiajs/react';
+import { useForm, Head, Link, usePage } from '@inertiajs/react';
 
 export default function Reply({ feedback }) {
+    const { props } = usePage();
     const { data, setData, post, processing } = useForm({
         content: '',
     });
@@ -25,31 +26,19 @@ export default function Reply({ feedback }) {
         setAiLoading(true);
         
         try {
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const res = await fetch(route('feedback.replies.ai.generate', feedback.id), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrf || ''
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({}),
-            });
+            // Utiliser Inertia pour faire la requête avec le bon CSRF token
+            const response = await window.axios.post(
+                route('feedback.replies.ai.generate', feedback.id)
+            );
 
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text || 'Erreur lors de la génération IA');
-            }
-
-            const json = await res.json();
-            if (json?.content) {
-                setData('content', json.content);
+            if (response.data?.content) {
+                setData('content', response.data.content);
             } else {
                 throw new Error('Réponse IA invalide');
             }
-        } catch (e) {
-            setAiError(e.message || 'Erreur IA');
+        } catch (error) {
+            const message = error.response?.data?.message || error.message || 'Erreur lors de la génération IA';
+            setAiError(message);
         } finally {
             setAiLoading(false);
         }
