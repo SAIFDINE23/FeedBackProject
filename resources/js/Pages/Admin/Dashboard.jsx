@@ -22,6 +22,47 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
         ? Math.max(...feedbackEvolution.map(e => e.count || 0), 1) 
         : 1;
 
+    // Fonction pour formater les nombres avec séparateur de milliers
+    const formatNumber = (num) => {
+        return new Intl.NumberFormat('fr-FR').format(num);
+    };
+
+    // Insight automatique basé sur les données
+    const getInsight = () => {
+        if (stats.satisfactionRate >= 90) {
+            return {
+                type: 'success',
+                icon: '🎉',
+                title: 'Excellente performance !',
+                message: `${stats.satisfactionRate}% de satisfaction. Les entreprises adorent votre plateforme !`
+            };
+        } else if (stats.npsScore >= 50) {
+            return {
+                type: 'success',
+                icon: '✨',
+                title: 'NPS exceptionnel',
+                message: `Score NPS de ${stats.npsScore}. Vos clients sont de véritables promoteurs !`
+            };
+        } else if (stats.feedbacksGrowth > 20) {
+            return {
+                type: 'info',
+                icon: '📈',
+                title: 'Forte croissance',
+                message: `+${stats.feedbacksGrowth}% de feedbacks ce mois. Continuez ainsi !`
+            };
+        } else if (stats.responseRate < 30) {
+            return {
+                type: 'warning',
+                icon: '⚠️',
+                title: 'Taux de réponse faible',
+                message: `Seulement ${stats.responseRate}% de réponses. Encouragez vos entreprises à répondre plus.`
+            };
+        }
+        return null;
+    };
+
+    const insight = getInsight();
+
     return (
         <AdminLayout header="Dashboard Administrateur">
             <Head title="Dashboard Admin" />
@@ -30,19 +71,41 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Header avec badge */}
                     <div className="mb-8">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrateur</h1>
                                 <p className="mt-2 text-sm text-gray-600">
                                     Vue d'ensemble complète de votre plateforme
                                 </p>
                             </div>
-                            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-indigo-100 rounded-lg">
-                                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                                <span className="text-sm font-medium text-indigo-700">En direct</span>
+                            <div className="flex items-center gap-3">
+                                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-indigo-100 rounded-lg">
+                                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
+                                    <span className="text-sm font-medium text-indigo-700">En direct</span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Insight automatique */}
+                    {insight && (
+                        <div className={`mb-8 p-6 rounded-xl border-2 ${
+                            insight.type === 'success' ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' :
+                            insight.type === 'warning' ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200' :
+                            'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'
+                        }`}>
+                            <div className="flex items-start gap-4">
+                                <div className="text-4xl">{insight.icon}</div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-gray-900 mb-1">{insight.title}</h3>
+                                    <p className="text-gray-700">{insight.message}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* KPIs Cards - Design amélioré */}
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -52,7 +115,13 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600 mb-1">Entreprises</p>
-                                        <p className="text-3xl font-bold text-gray-900">{stats.totalCompanies}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{formatNumber(stats.totalCompanies)}</p>
+                                        {stats.companiesGrowth && (
+                                            <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${stats.companiesGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                <span>{stats.companiesGrowth >= 0 ? '↗' : '↘'}</span>
+                                                <span>{Math.abs(stats.companiesGrowth)}% ce mois</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +138,8 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600 mb-1">Clients</p>
-                                        <p className="text-3xl font-bold text-gray-900">{stats.totalCustomers}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{formatNumber(stats.totalCustomers)}</p>
+                                        <p className="text-xs text-gray-500 mt-2">Sur toute la plateforme</p>
                                     </div>
                                     <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +156,13 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-gray-600 mb-1">Feedbacks</p>
-                                        <p className="text-3xl font-bold text-gray-900">{stats.totalFeedbacks}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{formatNumber(stats.totalFeedbacks)}</p>
+                                        {stats.feedbacksGrowth && (
+                                            <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${stats.feedbacksGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                <span>{stats.feedbacksGrowth >= 0 ? '↗' : '↘'}</span>
+                                                <span>{Math.abs(stats.feedbacksGrowth)}% ce mois</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,6 +180,7 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                                     <div>
                                         <p className="text-sm font-medium text-gray-600 mb-1">Taux de réponse</p>
                                         <p className="text-3xl font-bold text-gray-900">{stats.responseRate}%</p>
+                                        <p className="text-xs text-gray-500 mt-2">{formatNumber(stats.totalFeedbackRequests)} demandes</p>
                                     </div>
                                     <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,6 +188,61 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                                         </svg>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Métriques avancées */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        {/* NPS Score */}
+                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-medium opacity-90">Net Promoter Score</h3>
+                                <svg className="w-6 h-6 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <p className="text-4xl font-bold">{stats.npsScore}</p>
+                                <span className="text-sm opacity-75">/ 100</span>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/20">
+                                <p className="text-xs opacity-75">
+                                    {stats.npsScore >= 50 ? 'Excellent' : stats.npsScore >= 0 ? 'Bon' : 'À améliorer'}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Satisfaction Rate */}
+                        <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-medium opacity-90">Taux de Satisfaction</h3>
+                                <svg className="w-6 h-6 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <p className="text-4xl font-bold">{stats.satisfactionRate}%</p>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/20">
+                                <p className="text-xs opacity-75">Clients avec 4-5 étoiles</p>
+                            </div>
+                        </div>
+
+                        {/* Note Moyenne */}
+                        <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-medium opacity-90">Note Moyenne</h3>
+                                <svg className="w-6 h-6 opacity-80" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <p className="text-4xl font-bold">{stats.averageRating}</p>
+                                <span className="text-sm opacity-75">/ 5</span>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/20">
+                                <p className="text-xs opacity-75">Sur {formatNumber(stats.totalFeedbacks)} feedbacks</p>
                             </div>
                         </div>
                     </div>
@@ -172,80 +304,126 @@ export default function AdminDashboard({ stats, ratingDistribution, replyStats, 
                         </div>
                     </div>
 
-                    {/* Graphique d'évolution - Design professionnel */}
+                    {/* Graphique d'évolution - Line Chart */}
                     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-8">
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900">Évolution des feedbacks</h3>
                                 <p className="text-sm text-gray-500 mt-1">30 derniers jours</p>
                             </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
+                                <span className="text-xs text-gray-600 font-medium">Feedbacks</span>
+                            </div>
                         </div>
                         {feedbackEvolution && feedbackEvolution.length > 0 ? (
                             <div className="relative">
-                                {/* Grille de fond */}
-                                <div className="absolute inset-0 flex flex-col justify-between pb-12">
-                                    {[0, 25, 50, 75, 100].map((percent) => (
-                                        <div key={percent} className="border-t border-gray-100"></div>
+                                {/* Grille de fond avec labels */}
+                                <div className="absolute inset-0 flex flex-col justify-between pb-12 pr-4">
+                                    {[maxCount, Math.floor(maxCount * 0.75), Math.floor(maxCount * 0.5), Math.floor(maxCount * 0.25), 0].map((value, idx) => (
+                                        <div key={idx} className="flex items-center">
+                                            <span className="text-xs text-gray-400 w-8 text-right">{value}</span>
+                                            <div className="flex-1 border-t border-gray-100 ml-2"></div>
+                                        </div>
                                     ))}
                                 </div>
                                 
-                                {/* Graphique */}
-                                <div className="relative h-64 flex items-end justify-between gap-1 px-2">
-                                    {feedbackEvolution.map((item, index) => {
-                                        const height = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                                        const dateObj = new Date(item.date + 'T00:00:00');
-                                        const dayLabel = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-                                        const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+                                {/* Graphique linéaire */}
+                                <div className="relative h-64 ml-10">
+                                    <svg className="w-full h-full" viewBox="0 0 1000 256" preserveAspectRatio="none">
+                                        {/* Dégradé sous la courbe */}
+                                        <defs>
+                                            <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+                                                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
+                                                <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
                                         
-                                        return (
-                                            <div key={index} className="flex-1 flex flex-col items-center group relative">
-                                                {/* Barre */}
-                                                <div 
-                                                    className={`w-full rounded-t-lg transition-all duration-300 cursor-pointer relative overflow-hidden ${
-                                                        item.count > 0 
-                                                            ? 'bg-gradient-to-t from-indigo-600 to-indigo-400 hover:from-indigo-700 hover:to-indigo-500 shadow-md hover:shadow-lg' 
-                                                            : 'bg-gray-100'
-                                                    }`}
-                                                    style={{ 
-                                                        height: `${Math.max(height, item.count > 0 ? 3 : 0)}%`,
-                                                        minHeight: item.count > 0 ? '8px' : '2px'
-                                                    }}
-                                                    title={`${dayLabel}: ${item.count} feedback${item.count > 1 ? 's' : ''}`}
-                                                >
-                                                    {item.count > 0 && (
-                                                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                                                    )}
-                                                </div>
-                                                
-                                                {/* Tooltip */}
-                                                {item.count > 0 && (
-                                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 shadow-lg">
-                                                        <div className="font-semibold">{item.count} feedback{item.count > 1 ? 's' : ''}</div>
-                                                        <div className="text-gray-300">{dayLabel}</div>
-                                                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                                                    </div>
-                                                )}
-                                                
-                                                {/* Date (tous les 5 jours) */}
-                                                {index % 5 === 0 && (
-                                                    <span className="text-xs text-gray-500 mt-2 font-medium">
-                                                        {dayLabel}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                        {/* Zone sous la courbe */}
+                                        <path
+                                            d={(() => {
+                                                const points = feedbackEvolution.map((item, index) => {
+                                                    const x = (index / (feedbackEvolution.length - 1)) * 1000;
+                                                    const y = 256 - (maxCount > 0 ? (item.count / maxCount) * 256 : 0);
+                                                    return `${x},${y}`;
+                                                });
+                                                return `M 0,256 L ${points.join(' L ')} L 1000,256 Z`;
+                                            })()}
+                                            fill="url(#areaGradient)"
+                                        />
+                                        
+                                        {/* Ligne principale */}
+                                        <polyline
+                                            points={feedbackEvolution.map((item, index) => {
+                                                const x = (index / (feedbackEvolution.length - 1)) * 1000;
+                                                const y = 256 - (maxCount > 0 ? (item.count / maxCount) * 256 : 0);
+                                                return `${x},${y}`;
+                                            }).join(' ')}
+                                            fill="none"
+                                            stroke="#6366f1"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="drop-shadow-lg"
+                                        />
+                                        
+                                        {/* Points interactifs */}
+                                        {feedbackEvolution.map((item, index) => {
+                                            const x = (index / (feedbackEvolution.length - 1)) * 1000;
+                                            const y = 256 - (maxCount > 0 ? (item.count / maxCount) * 256 : 0);
+                                            const dateObj = new Date(item.date + 'T00:00:00');
+                                            const dayLabel = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                                            
+                                            return (
+                                                <g key={index} className="group">
+                                                    {/* Point */}
+                                                    <circle
+                                                        cx={x}
+                                                        cy={y}
+                                                        r="5"
+                                                        fill="white"
+                                                        stroke="#6366f1"
+                                                        strokeWidth="2"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer drop-shadow-md"
+                                                    />
+                                                    <circle
+                                                        cx={x}
+                                                        cy={y}
+                                                        r="8"
+                                                        fill="transparent"
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <title>{`${dayLabel}: ${item.count} feedback${item.count > 1 ? 's' : ''}`}</title>
+                                                    </circle>
+                                                </g>
+                                            );
+                                        })}
+                                    </svg>
+                                    
+                                    {/* Labels de dates */}
+                                    <div className="absolute bottom-0 left-0 right-0 flex justify-between mt-2 px-1">
+                                        {feedbackEvolution.map((item, index) => {
+                                            if (index % 5 !== 0) return null;
+                                            const dateObj = new Date(item.date + 'T00:00:00');
+                                            const dayLabel = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                                            return (
+                                                <span key={index} className="text-xs text-gray-500 font-medium">
+                                                    {dayLabel}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                                 
                                 {/* Légende */}
-                                <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-100">
+                                <div className="flex items-center justify-center gap-4 mt-8 pt-4 border-t border-gray-100">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded bg-indigo-500"></div>
+                                        <div className="w-3 h-0.5 bg-indigo-500"></div>
                                         <span className="text-xs text-gray-600">Feedbacks reçus</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 rounded bg-gray-200"></div>
-                                        <span className="text-xs text-gray-600">Aucun feedback</span>
+                                        <div className="w-3 h-3 rounded-full border-2 border-indigo-500 bg-white"></div>
+                                        <span className="text-xs text-gray-600">Points de données</span>
                                     </div>
                                 </div>
                             </div>
