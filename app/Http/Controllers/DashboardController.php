@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Feedback;
 use App\Models\FeedbackRequest;
+use App\Services\RadarAnalysisService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -77,6 +79,62 @@ $stats['ratings'] = collect([1, 2, 3, 4, 5])->mapWithKeys(function ($star) use (
             'stats' => $stats,
             'customers' => $customers,
             'recentFeedbacks' => $feedbacks,
+        ]);
+    }
+
+    public function radar(RadarAnalysisService $radarService)
+    {
+        $company = Auth::user()->company;
+
+        $allFeedbacks = Feedback::query()
+            ->whereHas('feedbackRequest', function ($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })
+            ->get();
+
+        $analysisFeedbacks = Feedback::query()
+            ->whereHas('feedbackRequest', function ($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })
+            ->whereNotNull('comment')
+            ->with(['feedbackRequest.customer'])
+            ->latest()
+            ->take(200)
+            ->get();
+
+        $total = $allFeedbacks->count();
+        $positive = $allFeedbacks->filter(fn ($f) => $f->rating !== null && $f->rating >= 4)->count();
+        $negative = $allFeedbacks->filter(fn ($f) => $f->rating !== null && $f->rating <= 2)->count();
+        $neutral = $total - $positive - $negative;
+
+        $sentiment = [
+            'positive' => $positive,
+            'neutral' => $neutral,
+            'negative' => $negative,
+        ];
+
+        $payload = $analysisFeedbacks->map(function ($f) {
+            return [
+                'rating' => $f->rating,
+                'comment' => $f->comment,
+                'customer' => $f->feedbackRequest?->customer?->name,
+                'created_at' => optional($f->created_at)->format('Y-m-d'),
+            ];
+        })->values()->all();
+
+        $analysis = $radarService->analyze($payload, $sentiment);
+
+        return Inertia::render('Dashboard/RadarIA', [
+            'stats' => [
+                'total' => $total,
+                'positive' => $positive,
+                'negative' => $negative,
+                'neutral' => $neutral,
+                'positiveRate' => $total > 0 ? round(($positive / $total) * 100, 1) : 0,
+                'negativeRate' => $total > 0 ? round(($negative / $total) * 100, 1) : 0,
+            ],
+            'analysis' => $analysis,
+            'lastUpdated' => now()->format('Y-m-d H:i'),
         ]);
     }
 }

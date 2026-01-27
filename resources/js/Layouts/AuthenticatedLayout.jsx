@@ -1,11 +1,14 @@
 import { Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AuthenticatedLayout({ user, header, children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const navigation = [
         { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: route().current('dashboard'), enabled: true },
+        { name: 'Radar IA', href: 'radar', icon: RadarIcon, current: route().current('radar'), enabled: true },
+        { name: 'Tâches', href: 'tasks.index', icon: TaskIcon, current: route().current('tasks.*'), enabled: true },
         { name: 'Clients', href: 'customers.index', icon: UsersIcon, current: route().current('customers.*'), enabled: true },
         { name: 'Ajouter un client', href: 'customers.create', icon: UserPlusIcon, current: route().current('customers.create'), enabled: true },
         { name: 'Entreprise', href: 'company.edit', icon: BuildingIcon, current: route().current('company.*'), enabled: true },
@@ -20,8 +23,35 @@ export default function AuthenticatedLayout({ user, header, children }) {
         }
     };
 
+    useEffect(() => {
+        const start = () => setLoading(true);
+        const finish = () => setLoading(false);
+
+        const offStart = router.on('start', start);
+        const offFinish = router.on('finish', finish);
+
+        return () => {
+            offStart();
+            offFinish();
+        };
+    }, []);
+
     return (
         <div className="min-h-screen bg-gray-50">
+            {loading && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/70 backdrop-blur-sm">
+                    <div className="flex items-center gap-3 rounded-2xl border border-indigo-200 bg-white px-6 py-4 shadow-lg">
+                        <span className="relative flex h-6 w-6">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-50" />
+                            <span className="relative inline-flex h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+                        </span>
+                        <div>
+                            <p className="text-sm font-semibold text-gray-900">Chargement en cours…</p>
+                            <p className="text-xs text-gray-500">Merci de patienter quelques secondes.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Mobile sidebar backdrop */}
             {sidebarOpen && (
                 <div 
@@ -188,6 +218,22 @@ function ChartIcon({ className }) {
     return (
         <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+    );
+}
+
+function RadarIcon({ className }) {
+    return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2m5-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    );
+}
+
+function TaskIcon({ className }) {
+    return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 11l3 3L22 4M2 12a10 10 0 1010-10" />
         </svg>
     );
 }

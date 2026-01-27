@@ -157,4 +157,129 @@ class FeedbackRequestController extends Controller
 
         return back()->with('success', 'Demande de feedback envoyée avec succès');
     }
-}
+
+    /**
+     * Envoyer des demandes de feedback en masse
+     */
+    public function storeBulk(Request $request)
+    {
+        Log::info('FeedbackRequest.storeBulk called', [
+            'user_id' => Auth::id(),
+            'company_id' => Auth::user()->company->id ?? null,
+            'payload' => $request->all(),
+        ]);
+
+        // ✅ Validation
+        $data = $request->validate([
+            'customer_ids' => 'required|array|min:1',
+            'customer_ids.*' => 'exists:customers,id',
+            'channel' => 'required|in:email,sms',
+        ]);
+
+        $company = Auth::user()->company;
+        $successCount = 0;
+        $skipCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        foreach ($data['customer_ids'] as $customerId) {
+            // 🔒 Vérifier si feedback déjà envoyé
+            $alreadySent = FeedbackRequest::where('customer_id', $customerId)
+                ->where('company_id', $company->id)
+                ->whereIn('status', ['pending', 'sent'])
+                ->exists();
+
+            if ($alreadySent) {
+                $skipCount++;
+                Log::info('Skipping customer - feedback already exists', ['customer_id' => $customerId]);
+                continue;
+            }
+
+            try {
+                // ✅ Création de la demande
+                $feedbackRequest = FeedbackRequest::create([
+                    'company_id' => $company->id,
+                    'customer_id' => $customerId,
+                    'channel' => $data['channel'],
+                    'token' => Str::uuid(),
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                ]);
+
+                // 📧 EMAIL
+                if ($data['channel'] === 'email') {
+                    try {
+                        Mail::to($feedbackRequest->customer->email)
+                            ->queue(new FeedbackRequestMail($feedbackRequest));
+                        $successCount++;
+                    } catch (\Throwable $e) {
+                        $errorCount++;
+                        $errors[] = "Email pour {$feedbackRequest->customer->email}: {$e->getMessage()}";
+                        Log::error('Bulk email failed', [
+                            'customer_id' => $customerId,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                // 📱 SMS
+                if ($data['channel'] === 'sms') {
+                    if (empty($feedbackRequest->customer->phone)) {
+                        $skipCount++;
+                        Log::warning('Customer phone missing', ['customer_id' => $customerId]);
+                        continue;
+                    }
+
+                    try {
+                        $link = rtrim(config('app.url'), '/') . '/feedback/' . $feedbackRequest->token;
+                        $sms = app(SmsService::class)->send(
+                            $feedbackRequest->customer->phone,
+                            "Bonjour 👋\nMerci de donner votre avis : " . $link
+                        );
+
+                        $feedbackRequest->update([
+                            'provider' => 'twilio',
+                            'provider_message_id' => $sms['sid'] ?? null,
+                            'provider_response' => json_encode($sms),
+                        ]);
+
+                        $successCount++;
+                    } catch (\Throwable $e) {
+                        $errorCount++;
+                        $errors[] = "SMS pour {$feedbackRequest->customer->phone}: {$e->getMessage()}";
+                        Log::error('Bulk SMS failed', [
+                            'customer_id' => $customerId,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                $errorCount++;
+                $errors[] = "Client ID {$customerId}: {$e->getMessage()}";
+                Log::error('Bulk feedback request creation failed', [
+                    'customer_id' => $customerId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        Log::info('FeedbackRequest.storeBulk completed', [
+            'success' => $successCount,
+            'skipped' => $skipCount,
+            'errors' => $errorCount,
+        ]);
+
+        $message = "$successCount demandes envoyées avec succès";
+        if ($skipCount > 0) {
+            $message .= ", $skipCount ignorées (déjà envoyées ou sans téléphone)";
+        }
+        if ($errorCount > 0) {
+            $message .= ", $errorCount erreurs";
+        }
+
+        if ($errorCount > 0 && count($errors) > 0) {
+            return back()->with('success', $message)->withErrors(['bulk_errors' => $errors]);
+        }
+
+        return back()->with('success', $message);
+    }}

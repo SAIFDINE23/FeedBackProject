@@ -11,7 +11,8 @@ use App\Http\Controllers\{
     FeedbackController,
     FeedbackRequestController,
     ProfileController,
-    FeedbackReplyController
+    FeedbackReplyController,
+    TaskController
 };
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\IsAdmin;
@@ -81,6 +82,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+    Route::get('/radar-ia', [DashboardController::class, 'radar'])
+        ->name('radar');
+
+    /*
+    | Tasks (company)
+    */
+    Route::get('/tasks', [TaskController::class, 'index'])
+        ->name('tasks.index');
+    Route::post('/tasks', [TaskController::class, 'store'])
+        ->name('tasks.store');
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
+        ->name('tasks.updateStatus');
+
     /*
     | Profile
     */
@@ -117,6 +131,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::post('/feedback-requests', [FeedbackRequestController::class, 'store'])
         ->name('feedback-requests.store');
+    
+    Route::post('/feedback-requests/bulk', [FeedbackRequestController::class, 'storeBulk'])
+        ->name('feedback-requests.bulk');
 });
 
 /*

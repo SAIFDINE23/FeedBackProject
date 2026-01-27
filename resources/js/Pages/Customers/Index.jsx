@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, Link } from '@inertiajs/react';
-import { Mail, MessageSquare, QrCode, Smartphone, Send, Trash2, Users } from 'lucide-react';
+import { Mail, MessageSquare, QrCode, Smartphone, Send, Trash2, Users, CheckSquare } from 'lucide-react';
 
 export default function Index({ auth, customers }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [channelMenuVisible, setChannelMenuVisible] = useState(false);
+    const [selectedCustomers, setSelectedCustomers] = useState([]);
+    const [bulkChannelMenuVisible, setBulkChannelMenuVisible] = useState(false);
 
     const openChannelMenu = (customer) => {
         setSelectedCustomer(customer);
@@ -23,6 +25,35 @@ export default function Index({ auth, customers }) {
 
         setChannelMenuVisible(false);
         setSelectedCustomer(null);
+    };
+
+    const sendBulkFeedback = (channel) => {
+        router.post(route('feedback-requests.bulk'), {
+            customer_ids: selectedCustomers,
+            channel,
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setSelectedCustomers([]);
+                setBulkChannelMenuVisible(false);
+            },
+        });
+    };
+
+    const toggleCustomerSelection = (customerId) => {
+        setSelectedCustomers(prev => 
+            prev.includes(customerId) 
+                ? prev.filter(id => id !== customerId)
+                : [...prev, customerId]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedCustomers.length === filteredCustomers.length) {
+            setSelectedCustomers([]);
+        } else {
+            setSelectedCustomers(filteredCustomers.map(c => c.id));
+        }
     };
 
     const deleteCustomer = (id, name) => {
@@ -69,8 +100,8 @@ export default function Index({ auth, customers }) {
             <Head title="Clients" />
 
             <div className="py-10 max-w-7xl mx-auto px-6">
-                {/* Search */}
-                <div className="mb-6">
+                {/* Search & Actions */}
+                <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <input
                         type="text"
                         placeholder="Rechercher un client..."
@@ -78,6 +109,27 @@ export default function Index({ auth, customers }) {
                         onChange={e => setSearchTerm(e.target.value)}
                         className="w-full md:w-1/3 px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
                     />
+                    
+                    {selectedCustomers.length > 0 && (
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-gray-700">
+                                {selectedCustomers.length} client{selectedCustomers.length > 1 ? 's' : ''} sélectionné{selectedCustomers.length > 1 ? 's' : ''}
+                            </span>
+                            <button
+                                onClick={() => setBulkChannelMenuVisible(true)}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                            >
+                                <Send className="w-4 h-4" />
+                                Envoyer les feedbacks
+                            </button>
+                            <button
+                                onClick={() => setSelectedCustomers([])}
+                                className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                            >
+                                Annuler
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Table */}
@@ -85,6 +137,14 @@ export default function Index({ auth, customers }) {
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50 border-b">
                             <tr>
+                                <th className="px-6 py-3 text-left">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
+                                        onChange={toggleSelectAll}
+                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                    />
+                                </th>
                                 <th className="px-6 py-3 text-left">Client</th>
                                 <th className="px-6 py-3 text-left">Contact</th>
                                 <th className="px-6 py-3 text-left">Dernier envoi</th>
@@ -97,6 +157,14 @@ export default function Index({ auth, customers }) {
                                 const last = customer.feedback_requests?.[0];
                                 return (
                                     <tr key={customer.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedCustomers.includes(customer.id)}
+                                                onChange={() => toggleCustomerSelection(customer.id)}
+                                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                            />
+                                        </td>
                                         <td className="px-6 py-4 font-medium">
                                             {customer.name || 'Sans nom'}
                                         </td>
@@ -132,7 +200,7 @@ export default function Index({ auth, customers }) {
                 </div>
             </div>
 
-            {/* Modal choix canal */}
+            {/* Modal choix canal - envoi individuel */}
             {channelMenuVisible && selectedCustomer && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
@@ -152,6 +220,32 @@ export default function Index({ auth, customers }) {
 
                         <button
                             onClick={() => setChannelMenuVisible(false)}
+                            className="mt-6 w-full py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+                        >
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal choix canal - envoi en masse */}
+            {bulkChannelMenuVisible && selectedCustomers.length > 0 && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+                        <h3 className="text-lg font-semibold mb-4">
+                            Envoyer des feedbacks en masse
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-6">
+                            Choisissez le canal pour envoyer à <b>{selectedCustomers.length} client{selectedCustomers.length > 1 ? 's' : ''}</b>
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <ChannelButton icon={<Mail />} label="Email" onClick={() => sendBulkFeedback('email')} />
+                            <ChannelButton icon={<MessageSquare />} label="SMS" onClick={() => sendBulkFeedback('sms')} />
+                        </div>
+
+                        <button
+                            onClick={() => setBulkChannelMenuVisible(false)}
                             className="mt-6 w-full py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
                         >
                             Annuler
