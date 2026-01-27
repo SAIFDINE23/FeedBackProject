@@ -1,0 +1,14 @@
+node_modules/
+vendor/
+.env
+.env.local
+.git/
+.gitignore
+.dockerignore
+.DS_Store
+storage/logs/*
+bootstrap/cache/*
+public/storage
+.vscode/
+.idea/
+*.log
