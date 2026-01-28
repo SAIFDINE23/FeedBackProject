@@ -41,5 +41,16 @@ chown -R www-data:www-data /app/storage /app/bootstrap/cache
 echo "Test de la configuration PHP-FPM..."
 php-fpm -t || (echo "❌ Erreur de config PHP-FPM" && cat /usr/local/etc/php-fpm.d/*.conf && exit 1)
 
+# Fonction pour gérer les signaux de shutdown
+shutdown() {
+    echo "🛑 Signal de shutdown reçu, arrêt gracieux..."
+    /usr/bin/supervisorctl -c /etc/supervisor/conf.d/supervisord.conf stop all
+    /usr/bin/supervisorctl -c /etc/supervisor/conf.d/supervisord.conf shutdown
+    exit 0
+}
+
+# Capture des signaux
+trap shutdown SIGTERM SIGINT SIGQUIT
+
 echo "🚀 Lancement de Supervisord..."
 exec /usr/bin/supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
