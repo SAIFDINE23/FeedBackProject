@@ -48,11 +48,19 @@ if [ -n "$PORT" ] && [ -f /etc/nginx/conf.d/default.conf ]; then
 fi
 
 if ! grep -q '^APP_KEY=' /app/.env; then
-  echo "APP_KEY=" >> /app/.env
+  if [ -n "$APP_KEY" ]; then
+    echo "APP_KEY=${APP_KEY}" >> /app/.env
+  else
+    echo "APP_KEY=" >> /app/.env
+  fi
 fi
 
-echo "Génération de clé..."
-php /app/artisan key:generate --force || echo "⚠️  Erreur key:generate"
+if [ -n "$APP_KEY" ]; then
+  echo "APP_KEY déjà fourni par l'environnement, génération ignorée."
+else
+  echo "Génération de clé..."
+  php /app/artisan key:generate --force || echo "⚠️  Erreur key:generate"
+fi
 
 echo "Exécution des migrations..."
 php /app/artisan migrate --force 2>&1 || echo "⚠️  Erreur migrations (retrying next boot)"

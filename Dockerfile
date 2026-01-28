@@ -56,6 +56,9 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /app/docker/entrypoint.sh
 
 # Setup permissions
+RUN mkdir -p /var/log/supervisor /var/run/nginx /var/cache/nginx && \
+    chown -R www-data:www-data /var/log/supervisor /var/run/nginx /var/cache/nginx
+
 RUN chown -R www-data:www-data /app && \
     chmod -R 755 /app && \
     chmod -R 775 storage bootstrap/cache && \
