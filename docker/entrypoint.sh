@@ -1,6 +1,22 @@
 #!/bin/bash
 set -e
 
+if [ -n "$DATABASE_URL" ] && [ -z "$DB_URL" ]; then
+  export DB_URL="$DATABASE_URL"
+fi
+
+if [ -n "$DB_URL" ] && [ -z "$DB_HOST" ]; then
+  export DB_CONNECTION="${DB_CONNECTION:-pgsql}"
+  export DB_HOST="$(php -r '$u=getenv("DB_URL"); $p=parse_url($u); echo $p["host"] ?? "";')"
+  export DB_PORT="$(php -r '$u=getenv("DB_URL"); $p=parse_url($u); echo $p["port"] ?? "";')"
+  export DB_DATABASE="$(php -r '$u=getenv("DB_URL"); $p=parse_url($u); $path=$p["path"] ?? ""; echo ltrim($path, "/");')"
+  export DB_USERNAME="$(php -r '$u=getenv("DB_URL"); $p=parse_url($u); echo $p["user"] ?? "";')"
+  export DB_PASSWORD="$(php -r '$u=getenv("DB_URL"); $p=parse_url($u); echo $p["pass"] ?? "";')"
+  if [ -z "$DB_SSLMODE" ]; then
+    export DB_SSLMODE="$(php -r '$u=getenv("DB_URL"); $p=parse_url($u); parse_str($p["query"] ?? "", $q); echo $q["sslmode"] ?? "";')"
+  fi
+fi
+
 echo "Attendre PostgreSQL..."
 MAX_ATTEMPTS=30
 ATTEMPT=0
@@ -19,7 +35,19 @@ if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
 fi
 
 if [ ! -f /app/.env ]; then
+  if [ -f /app/.env.example ]; then
     cp /app/.env.example /app/.env
+  else
+    touch /app/.env
+  fi
+fi
+
+if [ -n "$PORT" ] && [ -f /etc/nginx/conf.d/default.conf ]; then
+  sed -i "s/listen 80 default_server;/listen ${PORT} default_server;/" /etc/nginx/conf.d/default.conf
+fi
+
+if ! grep -q '^APP_KEY=' /app/.env; then
+  echo "APP_KEY=" >> /app/.env
 fi
 
 echo "Génération de clé..."
