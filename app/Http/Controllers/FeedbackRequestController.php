@@ -80,10 +80,11 @@ class FeedbackRequestController extends Controller
             ]);
 
             try {
+                // Utilisation de send() au lieu de queue() pour passer outre le Worker
                 Mail::to($feedbackRequest->customer->email)
-                    ->queue(new FeedbackRequestMail($feedbackRequest));
+                    ->send(new FeedbackRequestMail($feedbackRequest));
 
-                Log::info('Email queued successfully', [
+                Log::info('Email sent successfully (Sync)', [
                     'to' => $feedbackRequest->customer->email,
                 ]);
             } catch (\Throwable $e) {
