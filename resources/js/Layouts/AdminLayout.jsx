@@ -37,23 +37,21 @@ export default function AdminLayout({ header, children }) {
 
             {/* Sidebar */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-indigo-900 to-indigo-800 border-r border-indigo-700
+                fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-luminea-700 to-luminea-600 border-r border-luminea-500
                 transform transition-transform duration-300 ease-in-out
                 lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="flex items-center gap-3 px-6 py-5 border-b border-indigo-700">
-                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-                            <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h1 className="text-lg font-bold text-white">Admin</h1>
-                            <p className="text-xs text-indigo-200">Plateforme</p>
-                        </div>
+                    <div className="flex items-center gap-3 px-6 py-4 border-b border-luminea-500">
+                        <Link href={route('admin.dashboard')} className="flex items-center gap-3 hover:opacity-80 transition">
+                            <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto" />
+                            <div className="hidden sm:block">
+                                <h1 className="text-lg font-bold text-white">LUMINEA</h1>
+                                <p className="text-xs text-indigo-200">Admin</p>
+                            </div>
+                        </Link>
                     </div>
 
                     {/* Navigation */}
@@ -71,12 +69,12 @@ export default function AdminLayout({ header, children }) {
                                         flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
                                         transition-colors duration-200
                                         ${item.current 
-                                            ? 'bg-white text-indigo-900' 
-                                            : 'text-indigo-100 hover:bg-indigo-700'
+                                            ? 'bg-white text-luminea-700' 
+                                            : 'text-luminea-50 hover:bg-luminea-600'
                                         }
                                     `}
                                 >
-                                    <item.icon className={`w-5 h-5 ${item.current ? 'text-indigo-600' : 'text-indigo-300'}`} />
+                                    <item.icon className={`w-5 h-5 ${item.current ? 'text-luminea-700' : 'text-luminea-200'}`} />
                                     {item.name}
                                 </Link>
                             );
@@ -84,10 +82,10 @@ export default function AdminLayout({ header, children }) {
                     </nav>
 
                     {/* User & Logout */}
-                    <div className="border-t border-indigo-700 p-4 space-y-2">
+                    <div className="border-t border-luminea-500 p-4 space-y-2">
                         <div className="flex items-center gap-3 px-4 py-3">
                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                                <span className="text-indigo-700 font-semibold text-sm">
+                                <span className="text-luminea-700 font-semibold text-sm">
                                     {user?.name?.charAt(0).toUpperCase() || 'A'}
                                 </span>
                             </div>
@@ -95,7 +93,7 @@ export default function AdminLayout({ header, children }) {
                                 <p className="text-sm font-medium text-white truncate">
                                     {user?.name || 'Admin'}
                                 </p>
-                                <p className="text-xs text-indigo-200 truncate">
+                                <p className="text-xs text-luminea-100 truncate">
                                     {user?.email || 'admin@example.com'}
                                 </p>
                             </div>
@@ -103,7 +101,7 @@ export default function AdminLayout({ header, children }) {
                         
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white hover:bg-indigo-700 transition-colors duration-200"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white hover:bg-luminea-600 transition-colors duration-200"
                         >
                             <LogoutIcon className="w-5 h-5" />
                             Déconnexion
@@ -128,7 +126,7 @@ export default function AdminLayout({ header, children }) {
                         </div>
                         
                         <div className="flex items-center gap-4">
-                            <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full">
+                            <span className="px-3 py-1 bg-luminea-100 text-luminea-800 text-xs font-semibold rounded-full">
                                 ADMIN
                             </span>
                         </div>

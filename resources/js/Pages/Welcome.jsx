@@ -3,22 +3,28 @@ import { Head, Link } from '@inertiajs/react';
 export default function Welcome({ auth }) {
     return (
         <>
-            <Head title="Feedback Platform - Collectez les avis de vos clients" />
+            <Head title="Luminea - Transformez vos feedbacks en opportunités" />
             
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-luminea-900 to-indigo-950 relative overflow-hidden">
+                {/* Animated Background Elements */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-luminea-500/20 rounded-full blur-3xl animate-pulse"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl"></div>
+                    
+                    {/* Grid Pattern Overlay */}
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40"></div>
+                </div>
+
                 {/* Header */}
-                <header className="border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+                <header className="relative border-b border-white/10 bg-white/5 backdrop-blur-xl sticky top-0 z-50 shadow-lg shadow-black/10">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <span className="text-xl font-bold text-slate-900 block leading-tight">Feedback Platform</span>
-                                    <span className="text-xs text-slate-500">Gestion des avis clients</span>
+                            <div className="flex items-center space-x-4">
+                                <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto drop-shadow-2xl" />
+                                <div className="hidden sm:block">
+                                    <span className="text-2xl font-bold bg-gradient-to-r from-white to-luminea-200 bg-clip-text text-transparent block leading-tight tracking-tight">LUMINEA</span>
+                                    <span className="text-xs text-luminea-300">Intelligence Feedback Plateforme</span>
                                 </div>
                             </div>
 
@@ -26,23 +32,28 @@ export default function Welcome({ auth }) {
                                 {auth.user ? (
                                     <Link
                                         href={route('dashboard')}
-                                        className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-200"
+                                        className="group px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-luminea-600 to-luminea-700 rounded-xl hover:from-luminea-500 hover:to-luminea-600 shadow-lg shadow-luminea-500/50 hover:shadow-luminea-400/50 transition-all duration-300 hover:scale-105"
                                     >
-                                        Dashboard
+                                        <span className="flex items-center gap-2">
+                                            Dashboard
+                                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </span>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link
                                             href={route('login')}
-                                            className="px-5 py-2.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors duration-200"
+                                            className="px-5 py-2.5 text-sm font-medium text-luminea-200 hover:text-white transition-colors duration-200"
                                         >
                                             Se connecter
                                         </Link>
                                         <Link
                                             href={route('register')}
-                                            className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-200"
+                                            className="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-luminea-600 to-luminea-700 rounded-xl hover:from-luminea-500 hover:to-luminea-600 shadow-lg shadow-luminea-500/50 hover:shadow-luminea-400/50 transition-all duration-300 hover:scale-105"
                                         >
-                                            Créer un compte
+                                            Démarrer
                                         </Link>
                                     </>
                                 )}
@@ -52,60 +63,59 @@ export default function Welcome({ auth }) {
                 </header>
 
                 {/* Hero Section */}
-                <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28">
-                    <div className="absolute inset-0 -z-10 overflow-hidden">
-                        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"></div>
-                        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
-                    </div>
-
-                    <div className="text-center">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-6">
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                            </svg>
-                            Solution de feedback moderne et sécurisée
+                <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pt-32 sm:pb-36">
+                    <div className="text-center relative z-10">
+                        {/* Badge */}
+                        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-luminea-500/20 to-purple-500/20 border border-luminea-400/30 text-luminea-300 text-sm font-medium mb-8 backdrop-blur-sm shadow-xl">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-luminea-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-luminea-400"></span>
+                            </span>
+                            Propulsé par l'Intelligence Artificielle
                         </div>
 
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                            Collectez et analysez
-                            <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mt-2">
-                                les avis de vos clients
+                        {/* Main Heading */}
+                        <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white tracking-tight leading-tight mb-6">
+                            Transformez vos
+                            <span className="block mt-2 bg-gradient-to-r from-luminea-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
+                                Feedbacks
                             </span>
-                            <span className="block text-3xl sm:text-4xl lg:text-5xl mt-2 text-slate-700">
-                                en toute simplicité
+                            <span className="block mt-2 text-4xl sm:text-5xl lg:text-6xl text-luminea-200">
+                                en opportunités de croissance
                             </span>
                         </h1>
                         
-                        <p className="mt-8 text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                            Améliorez la satisfaction client grâce à un système de notation structuré de 1 à 5 étoiles. 
-                            Recueillez des commentaires détaillés via une interface professionnelle et sécurisée.
+                        <p className="mt-8 text-xl sm:text-2xl text-luminea-200/90 max-w-4xl mx-auto leading-relaxed font-light">
+                            Collectez, analysez et optimisez l'expérience client avec notre plateforme d'intelligence feedback. 
+                            <span className="block mt-2 text-luminea-300">Réponses IA • Analyse en temps réel • Multi-canaux</span>
                         </p>
 
+                        {/* CTA Buttons */}
                         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="group w-full sm:w-auto px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center"
+                                    className="group w-full sm:w-auto px-10 py-5 text-lg font-bold text-slate-900 bg-gradient-to-r from-luminea-400 to-purple-400 rounded-2xl shadow-2xl shadow-luminea-500/50 hover:shadow-luminea-400/70 hover:scale-105 transition-all duration-300 flex items-center justify-center"
                                 >
                                     Accéder au dashboard
-                                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                    <svg className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                     </svg>
                                 </Link>
                             ) : (
                                 <>
                                     <Link
                                         href={route('register')}
-                                        className="group w-full sm:w-auto px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center"
+                                        className="group w-full sm:w-auto px-10 py-5 text-lg font-bold text-slate-900 bg-gradient-to-r from-luminea-400 to-purple-400 rounded-2xl shadow-2xl shadow-luminea-500/50 hover:shadow-luminea-400/70 hover:scale-105 transition-all duration-300 flex items-center justify-center"
                                     >
                                         Démarrer gratuitement
-                                        <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        <svg className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                         </svg>
                                     </Link>
                                     <Link
                                         href={route('login')}
-                                        className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-slate-700 bg-white border-2 border-slate-300 rounded-xl hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50/50 transition-all duration-200"
+                                        className="w-full sm:w-auto px-10 py-5 text-lg font-semibold text-white bg-white/10 border-2 border-white/20 rounded-2xl hover:bg-white/20 hover:border-luminea-400/50 backdrop-blur-sm transition-all duration-300"
                                     >
                                         Se connecter
                                     </Link>
@@ -113,235 +123,333 @@ export default function Welcome({ auth }) {
                             )}
                         </div>
 
-                        <div className="mt-12 flex items-center justify-center gap-8 text-sm text-slate-500">
-                            <div className="flex items-center">
-                                <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        {/* Trust Indicators */}
+                        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-luminea-300">
+                            <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full backdrop-blur-sm">
+                                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Aucune carte requise
+                                Sans carte bancaire
                             </div>
-                            <div className="flex items-center">
-                                <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full backdrop-blur-sm">
+                                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Installation rapide
+                                Configuration 2min
                             </div>
-                            <div className="flex items-center">
-                                <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full backdrop-blur-sm">
+                                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
-                                Support 24/7
+                                IA Intégrée
+                            </div>
+                            <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full backdrop-blur-sm">
+                                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Support Premium
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Floating Dashboard Preview (mockup) */}
+                    <div className="mt-20 relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-luminea-600/20 to-transparent blur-3xl"></div>
+                        <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-4 sm:p-8 overflow-hidden">
+                            <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-r from-luminea-500/20 to-purple-500/20 border-b border-white/10 flex items-center px-6 gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                            </div>
+                            <div className="mt-12 aspect-video bg-gradient-to-br from-slate-900/50 to-luminea-900/50 rounded-xl border border-white/10 flex items-center justify-center">
+                                <div className="text-center">
+                                    <div className="text-6xl mb-4">📊</div>
+                                    <p className="text-luminea-200 font-semibold">Dashboard Luminea</p>
+                                    <p className="text-luminea-400 text-sm mt-1">Analytics • IA • Multi-canal</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
                 {/* Features Section */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-                            Fonctionnalités complètes
+                <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+                    <div className="text-center mb-20 relative z-10">
+                        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6">
+                            Des fonctionnalités
+                            <span className="block bg-gradient-to-r from-luminea-400 to-purple-400 bg-clip-text text-transparent">
+                                qui font la différence
+                            </span>
                         </h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                            Tous les outils nécessaires pour gérer efficacement les feedbacks de vos clients
+                        <p className="text-xl text-luminea-200/80 max-w-3xl mx-auto font-light">
+                            Technologie de pointe combinée à une expérience utilisateur exceptionnelle
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {/* Feature 1 */}
-                        <div className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-8 border border-slate-100 hover:border-blue-200">
-                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 relative z-10">
+                        {/* Feature 1 - IA Génératrice */}
+                        <div className="group relative bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:border-luminea-400/50 transition-all duration-500 hover:scale-105 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-luminea-500/0 to-purple-500/0 group-hover:from-luminea-500/10 group-hover:to-purple-500/10 transition-all duration-500"></div>
                             <div className="relative">
-                                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                <div className="w-16 h-16 bg-gradient-to-br from-luminea-400 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-luminea-500/50 group-hover:shadow-luminea-400/70 transition-all duration-500 group-hover:rotate-6">
+                                    <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                    Notation par étoiles
+                                <h3 className="text-2xl font-bold text-white mb-4">
+                                    IA Génératrice de Réponses
                                 </h3>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Système de notation intuitif de 1 à 5 étoiles, simple et rapide pour vos clients.
+                                <p className="text-luminea-200/80 leading-relaxed">
+                                    Intelligence artificielle avancée pour générer automatiquement des réponses personnalisées et pertinentes à vos clients.
                                 </p>
+                                <div className="mt-6 flex items-center gap-2 text-luminea-300 text-sm">
+                                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                                    Powered by Gemini AI
+                                </div>
                             </div>
                         </div>
 
-                        {/* Feature 2 */}
-                        <div className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-8 border border-slate-100 hover:border-blue-200">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        {/* Feature 2 - Multi-canal */}
+                        <div className="group relative bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:border-luminea-400/50 transition-all duration-500 hover:scale-105 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-cyan-500/0 group-hover:from-blue-500/10 group-hover:to-cyan-500/10 transition-all duration-500"></div>
                             <div className="relative">
-                                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-blue-500/50 group-hover:shadow-blue-400/70 transition-all duration-500 group-hover:rotate-6">
+                                    <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                    Liens sécurisés par token
+                                <h3 className="text-2xl font-bold text-white mb-4">
+                                    Communication Multi-canal
                                 </h3>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Envoyez des liens de feedback personnalisés et protégés par token unique.
+                                <p className="text-luminea-200/80 leading-relaxed">
+                                    Envoyez vos demandes de feedback par Email, SMS ou QR Code. Flexibilité totale pour toucher vos clients.
                                 </p>
+                                <div className="mt-6 flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-400/20 text-blue-300 rounded-full text-xs font-semibold border border-blue-400/30">Email</span>
+                                    <span className="px-3 py-1 bg-green-400/20 text-green-300 rounded-full text-xs font-semibold border border-green-400/30">SMS</span>
+                                    <span className="px-3 py-1 bg-purple-400/20 text-purple-300 rounded-full text-xs font-semibold border border-purple-400/30">QR Code</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Feature 3 */}
-                        <div className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-8 border border-slate-100 hover:border-blue-200">
-                            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        {/* Feature 3 - Analytics */}
+                        <div className="group relative bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:border-luminea-400/50 transition-all duration-500 hover:scale-105 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/0 to-emerald-500/0 group-hover:from-green-500/10 group-hover:to-emerald-500/10 transition-all duration-500"></div>
                             <div className="relative">
-                                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-green-500/50 group-hover:shadow-green-400/70 transition-all duration-500 group-hover:rotate-6">
+                                    <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                    Analyse et statistiques
+                                <h3 className="text-2xl font-bold text-white mb-4">
+                                    Analytics en Temps Réel
                                 </h3>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Consultez et analysez tous vos feedbacks dans un tableau de bord centralisé.
+                                <p className="text-luminea-200/80 leading-relaxed">
+                                    Tableaux de bord interactifs avec statistiques détaillées, graphiques et insights pour piloter votre satisfaction client.
                                 </p>
+                                <div className="mt-6 text-green-300 text-sm font-medium">
+                                    📊 Visualisations avancées
+                                </div>
                             </div>
                         </div>
 
-                        {/* Feature 4 */}
-                        <div className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-8 border border-slate-100 hover:border-blue-200">
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        {/* Feature 4 - Notation 5 étoiles */}
+                        <div className="group relative bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:border-luminea-400/50 transition-all duration-500 hover:scale-105 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-orange-500/0 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 transition-all duration-500"></div>
                             <div className="relative">
-                                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-yellow-500/50 group-hover:shadow-yellow-400/70 transition-all duration-500 group-hover:rotate-6">
+                                    <svg className="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                    Sécurité maximale
+                                <h3 className="text-2xl font-bold text-white mb-4">
+                                    Système de Notation Étoiles
                                 </h3>
-                                <p className="text-slate-600 leading-relaxed">
-                                    Dashboard admin protégé avec authentification Laravel pour une gestion sécurisée.
+                                <p className="text-luminea-200/80 leading-relaxed">
+                                    Interface intuitive de notation de 1 à 5 étoiles avec commentaires détaillés pour capturer l'expérience client.
                                 </p>
+                                <div className="mt-6 flex gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </section>
 
-                {/* How it Works Section */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-                            Comment ça fonctionne ?
-                        </h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                            Un processus simple en 3 étapes pour commencer à collecter des feedbacks
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <div className="relative text-center">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-bold mb-6 shadow-lg">
-                                1
+                        {/* Feature 5 - Sécurité */}
+                        <div className="group relative bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:border-luminea-400/50 transition-all duration-500 hover:scale-105 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-red-500/0 to-pink-500/0 group-hover:from-red-500/10 group-hover:to-pink-500/10 transition-all duration-500"></div>
+                            <div className="relative">
+                                <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-red-500/50 group-hover:shadow-red-400/70 transition-all duration-500 group-hover:rotate-6">
+                                    <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-4">
+                                    Sécurité Maximale
+                                </h3>
+                                <p className="text-luminea-200/80 leading-relaxed">
+                                    Tokens sécurisés, authentification 2FA pour admins, et protection CSRF pour garantir la confidentialité des données.
+                                </p>
+                                <div className="mt-6 flex items-center gap-2 text-red-300 text-sm">
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    Certifié sécurisé
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                Créez une demande de feedback
-                            </h3>
-                            <p className="text-slate-600">
-                                Générez un lien unique sécurisé par token pour chaque client depuis votre dashboard.
-                            </p>
                         </div>
 
-                        <div className="relative text-center">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-bold mb-6 shadow-lg">
-                                2
+                        {/* Feature 6 - Radar IA */}
+                        <div className="group relative bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:border-luminea-400/50 transition-all duration-500 hover:scale-105 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-indigo-500/0 group-hover:from-purple-500/10 group-hover:to-indigo-500/10 transition-all duration-500"></div>
+                            <div className="relative">
+                                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-purple-500/50 group-hover:shadow-purple-400/70 transition-all duration-500 group-hover:rotate-6">
+                                    <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-4">
+                                    Radar IA Prédictif
+                                </h3>
+                                <p className="text-luminea-200/80 leading-relaxed">
+                                    Analyse prédictive et détection automatique des tendances pour anticiper les problèmes et opportunités.
+                                </p>
+                                <div className="mt-6 text-purple-300 text-sm font-medium">
+                                    🎯 Insights intelligents
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                Envoyez le lien à vos clients
-                            </h3>
-                            <p className="text-slate-600">
-                                Partagez le lien par email, SMS ou tout autre canal de communication.
-                            </p>
-                        </div>
-
-                        <div className="relative text-center">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full text-2xl font-bold mb-6 shadow-lg">
-                                3
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                Consultez et analysez
-                            </h3>
-                            <p className="text-slate-600">
-                                Recevez les évaluations et commentaires directement dans votre tableau de bord.
-                            </p>
                         </div>
                     </div>
                 </section>
 
                 {/* CTA Section */}
                 {!auth.user && (
-                    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
-                        <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl shadow-2xl overflow-hidden">
-                            <div className="absolute inset-0 bg-grid-white/10"></div>
-                            <div className="relative p-10 sm:p-16 text-center">
-                                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-                                    Prêt à transformer votre service client ?
+                    <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+                        <div className="relative bg-gradient-to-br from-luminea-600 via-purple-600 to-pink-600 rounded-[3rem] shadow-2xl shadow-luminea-500/50 overflow-hidden border border-white/20">
+                            {/* Decorative elements */}
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+                            <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+                            
+                            <div className="relative p-12 sm:p-20 text-center z-10">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-semibold mb-8">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                                    </span>
+                                    Offre de lancement
+                                </div>
+
+                                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+                                    Prêt à révolutionner
+                                    <span className="block mt-2">votre feedback client ?</span>
                                 </h2>
-                                <p className="text-blue-100 text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
-                                    Rejoignez les entreprises qui utilisent notre plateforme pour améliorer continuellement leur expérience client.
+                                <p className="text-white/90 text-lg sm:text-xl mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+                                    Rejoignez les entreprises innovantes qui utilisent Luminea pour transformer chaque feedback en opportunité de croissance.
                                 </p>
-                                <Link
-                                    href={route('register')}
-                                    className="inline-flex items-center px-8 py-4 text-base font-semibold text-blue-600 bg-white rounded-xl hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-200"
-                                >
-                                    Commencer gratuitement
-                                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                    </svg>
-                                </Link>
-                                <p className="mt-6 text-blue-100 text-sm">
-                                    Aucune carte bancaire requise • Configuration en 2 minutes
-                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                                    <Link
+                                        href={route('register')}
+                                        className="group w-full sm:w-auto px-10 py-5 text-lg font-bold text-luminea-600 bg-white rounded-2xl hover:bg-luminea-50 shadow-2xl hover:shadow-white/50 transition-all duration-300 flex items-center justify-center hover:scale-105"
+                                    >
+                                        Commencer gratuitement
+                                        <svg className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        </svg>
+                                    </Link>
+                                    <a href="#features" className="text-white font-semibold hover:text-white/80 transition-colors">
+                                        Découvrir les fonctionnalités →
+                                    </a>
+                                </div>
+                                <div className="mt-10 flex flex-wrap justify-center gap-6 text-white/80 text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        Gratuit pour toujours
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        Installation 2min
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        Sans engagement
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </section>
                 )}
 
                 {/* Footer */}
-                <footer className="border-t border-slate-200 bg-white/70 backdrop-blur-sm mt-20">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <footer className="relative border-t border-white/10 bg-gradient-to-br from-slate-900/95 to-luminea-900/95 backdrop-blur-xl mt-32">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                            {/* Brand Section */}
                             <div className="md:col-span-2">
-                                <div className="flex items-center space-x-3 mb-4">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                        </svg>
+                                <div className="flex items-center gap-4 mb-6">
+                                    <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto drop-shadow-2xl" />
+                                    <div>
+                                        <span className="text-2xl font-bold bg-gradient-to-r from-white to-luminea-200 bg-clip-text text-transparent block">LUMINEA</span>
+                                        <span className="text-xs text-luminea-300">Intelligence Feedback Platform</span>
                                     </div>
-                                    <span className="text-xl font-bold text-slate-900">Feedback Platform</span>
                                 </div>
-                                <p className="text-slate-600 max-w-md">
-                                    La solution professionnelle pour collecter, gérer et analyser les avis de vos clients en toute simplicité.
+                                <p className="text-luminea-200/70 max-w-md leading-relaxed mb-6">
+                                    Transformez chaque feedback client en opportunité de croissance grâce à notre plateforme d'intelligence feedback propulsée par l'IA.
                                 </p>
+                                <div className="flex gap-4">
+                                    <a href="#" className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                    </a>
+                                    <a href="#" className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                                    </a>
+                                    <a href="#" className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                                    </a>
+                                </div>
                             </div>
 
+                            {/* Links Columns */}
                             <div>
-                                <h3 className="font-semibold text-slate-900 mb-4">Produit</h3>
-                                <ul className="space-y-2 text-slate-600">
-                                    <li><a href="#" className="hover:text-blue-600 transition-colors">Fonctionnalités</a></li>
-                                    <li><a href="#" className="hover:text-blue-600 transition-colors">Tarifs</a></li>
-                                    <li><a href="#" className="hover:text-blue-600 transition-colors">Documentation</a></li>
+                                <h3 className="font-bold text-white mb-4 text-lg">Produit</h3>
+                                <ul className="space-y-3 text-luminea-200/70">
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Fonctionnalités</a></li>
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Tarifs</a></li>
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Intégrations</a></li>
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Mises à jour</a></li>
                                 </ul>
                             </div>
 
                             <div>
-                                <h3 className="font-semibold text-slate-900 mb-4">Entreprise</h3>
-                                <ul className="space-y-2 text-slate-600">
-                                    <li><a href="#" className="hover:text-blue-600 transition-colors">À propos</a></li>
-                                    <li><a href="#" className="hover:text-blue-600 transition-colors">Contact</a></li>
-                                    <li><a href="#" className="hover:text-blue-600 transition-colors">Support</a></li>
+                                <h3 className="font-bold text-white mb-4 text-lg">Entreprise</h3>
+                                <ul className="space-y-3 text-luminea-200/70">
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">À propos</a></li>
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Blog</a></li>
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Support</a></li>
+                                    <li><a href="#" className="hover:text-luminea-400 transition-colors">Contact</a></li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div className="pt-8 border-t border-slate-200">
-                            <p className="text-center text-slate-600 text-sm">
-                                © 2026 Feedback Platform. Tous droits réservés. Propulsé par Laravel + React + Inertia.js
-                            </p>
+                        <div className="pt-8 border-t border-white/10">
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                                <p className="text-luminea-200/60 text-sm text-center md:text-left">
+                                    © 2026 Luminea. Tous droits réservés. Propulsé par Laravel • React • Inertia • Gemini AI
+                                </p>
+                                <div className="flex gap-6 text-sm text-luminea-200/60">
+                                    <a href="#" className="hover:text-luminea-400 transition-colors">Confidentialité</a>
+                                    <a href="#" className="hover:text-luminea-400 transition-colors">Conditions</a>
+                                    <a href="#" className="hover:text-luminea-400 transition-colors">Cookies</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </footer>

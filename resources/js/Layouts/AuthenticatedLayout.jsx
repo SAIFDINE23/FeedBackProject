@@ -43,8 +43,8 @@ export default function AuthenticatedLayout({ user, header, children }) {
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/70 backdrop-blur-sm">
                     <div className="flex items-center gap-3 rounded-2xl border border-indigo-200 bg-white px-6 py-4 shadow-lg">
                         <span className="relative flex h-6 w-6">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-50" />
-                            <span className="relative inline-flex h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-luminea-400 opacity-50" />
+                            <span className="relative inline-flex h-6 w-6 animate-spin rounded-full border-2 border-luminea-600 border-t-transparent" />
                         </span>
                         <div>
                             <p className="text-sm font-semibold text-gray-900">Chargement en cours…</p>
@@ -70,16 +70,14 @@ export default function AuthenticatedLayout({ user, header, children }) {
             `}>
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h1 className="text-lg font-bold text-gray-900">Feedback</h1>
-                            <p className="text-xs text-gray-500">Platform</p>
-                        </div>
+                    <div className="flex items-center gap-3 px-6 py-4 border-b border-luminea-200">
+                        <Link href={route('dashboard')} className="flex items-center gap-3 hover:opacity-80 transition">
+                            <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto" />
+                            <div className="hidden sm:block">
+                                <h1 className="text-lg font-bold text-gray-900">LUMINEA</h1>
+                                <p className="text-xs text-gray-500">Platform</p>
+                            </div>
+                        </Link>
                     </div>
 
                     {/* Navigation */}
@@ -108,12 +106,12 @@ export default function AuthenticatedLayout({ user, header, children }) {
                                         flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
                                         transition-colors duration-200
                                         ${item.current 
-                                            ? 'bg-blue-50 text-blue-700' 
+                                            ? 'bg-luminea-50 text-luminea-700' 
                                             : 'text-gray-700 hover:bg-gray-50'
                                         }
                                     `}
                                 >
-                                    <item.icon className={`w-5 h-5 ${item.current ? 'text-blue-600' : 'text-gray-400'}`} />
+                                    <item.icon className={`w-5 h-5 ${item.current ? 'text-luminea-600' : 'text-gray-400'}`} />
                                     {item.name}
                                 </Link>
                             );
@@ -123,8 +121,8 @@ export default function AuthenticatedLayout({ user, header, children }) {
                     {/* User & Logout */}
                     <div className="border-t border-gray-200 p-4 space-y-2">
                         <div className="flex items-center gap-3 px-4 py-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center">
-                                <span className="text-gray-700 font-semibold text-sm">
+                            <div className="w-10 h-10 bg-gradient-to-br from-luminea-400 to-luminea-700 rounded-full flex items-center justify-center">
+                                <span className="text-white font-semibold text-sm">
                                     {user?.name?.charAt(0).toUpperCase() || 'U'}
                                 </span>
                             </div>
