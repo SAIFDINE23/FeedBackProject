@@ -39,14 +39,28 @@ TWILIO_SID=votre_nouveau_sid
 TWILIO_AUTH_TOKEN=votre_nouveau_token
 TWILIO_FROM=+votre_numero
 
-# Mail
-MAIL_MAILER=smtp
-MAIL_HOST=votre_serveur_smtp
-MAIL_PORT=587
-MAIL_USERNAME=votre_email
-MAIL_PASSWORD=votre_mot_de_passe
-MAIL_ENCRYPTION=tls
+# Queue Processing (IMPORTANT: utiliser SYNC sur Render gratuit)
+QUEUE_CONNECTION=sync
+
+# Mail - Solution PRO & FIABLE
+# ⭐ RECOMMANDÉ: SendGrid (le standard de l'industrie)
+MAIL_MAILER=sendgrid
+SENDGRID_API_KEY=SG.votre_cle_complète_ici
 MAIL_FROM_ADDRESS=noreply@votre-domaine.com
+MAIL_FROM_NAME="Luminea"
+
+# Alternative 1: Mailgun
+# MAIL_MAILER=mailgun
+# MAILGUN_SECRET=mg_votre_cle
+# MAILGUN_DOMAIN=votre-domaine.mailgun.org
+
+# Alternative 2: AWS SES
+# MAIL_MAILER=smtp
+# MAIL_HOST=email-smtp.eu-west-1.amazonaws.com
+# MAIL_PORT=587
+# MAIL_USERNAME=votre_username
+# MAIL_PASSWORD=votre_password
+# MAIL_ENCRYPTION=tls
 ```
 
 ## Étapes de déploiement

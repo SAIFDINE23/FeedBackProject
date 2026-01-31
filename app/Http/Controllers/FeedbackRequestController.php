@@ -54,14 +54,14 @@ class FeedbackRequestController extends Controller
             ]);
         }
 
-        // ✅ Création de la demande
+        // ✅ Création de la demande (ne pas marquer "sent" avant l'envoi réel)
         $feedbackRequest = FeedbackRequest::create([
             'company_id'  => $company->id,
             'customer_id' => $data['customer_id'],
             'channel'     => $data['channel'],
             'token'       => Str::uuid(),
-            'status'      => 'sent',
-            'sent_at'     => now(),
+            'status'      => 'pending',
+            'sent_at'     => null,
         ]);
 
         // 🔹 Log création
@@ -86,10 +86,19 @@ class FeedbackRequestController extends Controller
                 Mail::to($feedbackRequest->customer->email)
                     ->send(new FeedbackRequestMail($feedbackRequest));
 
+                $feedbackRequest->update([
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                ]);
+
                 Log::info('Email sent successfully (Sync)', [
                     'to' => $feedbackRequest->customer->email,
                 ]);
             } catch (\Throwable $e) {
+                $feedbackRequest->update([
+                    'status' => 'failed',
+                ]);
+
                 Log::error('Email failed', [
                     'to' => $feedbackRequest->customer->email,
                     'error' => $e->getMessage(),
@@ -136,12 +145,18 @@ class FeedbackRequestController extends Controller
 
                 // 📦 Tracking provider
                 $feedbackRequest->update([
+                    'status'              => 'sent',
+                    'sent_at'             => now(),
                     'provider'             => 'twilio',
                     'provider_message_id'  => $sms['sid'] ?? null,
                     'provider_response'    => json_encode($sms),
                 ]);
 
             } catch (\Throwable $e) {
+                $feedbackRequest->update([
+                    'status' => 'failed',
+                ]);
+
                 Log::error('Twilio SMS FAILED', [
                     'to' => $feedbackRequest->customer->phone,
                     'error' => $e->getMessage(),
@@ -214,17 +229,26 @@ class FeedbackRequestController extends Controller
                     'customer_id' => $customerId,
                     'channel' => $data['channel'],
                     'token' => Str::uuid(),
-                    'status' => 'sent',
-                    'sent_at' => now(),
+                    'status' => 'pending',
+                    'sent_at' => null,
                 ]);
 
                 // 📧 EMAIL
                 if ($data['channel'] === 'email') {
                     try {
                         Mail::to($feedbackRequest->customer->email)
-                            ->queue(new FeedbackRequestMail($feedbackRequest));
+                            ->send(new FeedbackRequestMail($feedbackRequest));
+
+                        $feedbackRequest->update([
+                            'status' => 'sent',
+                            'sent_at' => now(),
+                        ]);
                         $successCount++;
                     } catch (\Throwable $e) {
+                        $feedbackRequest->update([
+                            'status' => 'failed',
+                        ]);
+
                         $errorCount++;
                         $errors[] = "Email pour {$feedbackRequest->customer->email}: {$e->getMessage()}";
                         Log::error('Bulk email failed', [
@@ -250,6 +274,8 @@ class FeedbackRequestController extends Controller
                         );
 
                         $feedbackRequest->update([
+                            'status' => 'sent',
+                            'sent_at' => now(),
                             'provider' => 'twilio',
                             'provider_message_id' => $sms['sid'] ?? null,
                             'provider_response' => json_encode($sms),
@@ -257,6 +283,10 @@ class FeedbackRequestController extends Controller
 
                         $successCount++;
                     } catch (\Throwable $e) {
+                        $feedbackRequest->update([
+                            'status' => 'failed',
+                        ]);
+
                         $errorCount++;
                         $errors[] = "SMS pour {$feedbackRequest->customer->phone}: {$e->getMessage()}";
                         Log::error('Bulk SMS failed', [
