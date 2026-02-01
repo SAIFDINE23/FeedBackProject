@@ -33,6 +33,7 @@ class FeedbackController extends Controller
                     'name' => $f->customer->name,
                 ],
                 'status' => $f->status,
+                'channel' => $f->channel,
                 'feedback' => [
                     'id' => $f->feedback?->id,
                     'rating' => $f->feedback?->rating,

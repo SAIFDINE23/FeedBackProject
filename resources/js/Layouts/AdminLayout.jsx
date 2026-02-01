@@ -8,6 +8,7 @@ export default function AdminLayout({ header, children }) {
 
     const navigation = [
         { name: 'Dashboard', href: 'admin.dashboard', icon: HomeIcon, current: route().current('admin.dashboard'), enabled: true },
+        { name: 'Radar IA', href: 'admin.radar', icon: RadarIcon, current: route().current('admin.radar'), enabled: true },
         { name: 'Entreprises', href: 'admin.companies', icon: BuildingIcon, current: route().current('admin.companies'), enabled: true },
         { name: 'Utilisateurs', href: 'admin.users', icon: UsersIcon, current: route().current('admin.users'), enabled: true },
         { name: 'Feedbacks', href: 'admin.feedbacks', icon: ChatIcon, current: route().current('admin.feedbacks'), enabled: true },
@@ -147,6 +148,16 @@ function HomeIcon({ className }) {
     return (
         <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+    );
+}
+
+function RadarIcon({ className }) {
+    return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12l6-2" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
     );
 }

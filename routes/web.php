@@ -16,6 +16,7 @@ use App\Http\Controllers\{
     TaskController
 };
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminRadarController;
 use App\Http\Middleware\IsAdmin;
 use App\Services\SmsService;
 
@@ -92,6 +93,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/radar-ia', [DashboardController::class, 'radar'])
         ->name('radar');
+    Route::get('/radar-ia/export', [DashboardController::class, 'exportRadar'])
+        ->name('radar.export');
 
     /*
     | Tasks (company)
@@ -153,6 +156,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', IsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])
         ->name('dashboard');
+
+    Route::get('/radar-ia', [AdminRadarController::class, 'index'])
+        ->name('radar');
+    Route::post('/radar-ia/regenerate', [AdminRadarController::class, 'regenerate'])
+        ->name('radar.regenerate');
 
     // Admin sections
     Route::get('/companies', [AdminController::class, 'companies'])

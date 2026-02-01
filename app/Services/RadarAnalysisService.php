@@ -8,6 +8,56 @@ use Illuminate\Support\Facades\Http;
 class RadarAnalysisService
 {
 	/**
+	 * Analyse globale (admin plateforme) avec cache.
+	 * Stocke les analyses globales dans radar_analyses avec company_id = NULL.
+	 */
+	public function analyzeGlobalWithCache(
+		array $feedbacks,
+		array $sentimentStats = [],
+		int $feedbacksWithComments = 0,
+		array $context = [],
+		bool $force = false
+	): array {
+		if (empty($feedbacks)) {
+			return $this->fallbackGlobalAnalysis($sentimentStats, $context, 'Aucun feedback à analyser pour le moment.');
+		}
+
+		$feedbackHash = $this->generateFeedbackHash($feedbacks);
+
+		if (! $force) {
+			$cachedAnalysis = RadarAnalysis::query()
+				->whereNull('company_id')
+				->where('feedback_hash', $feedbackHash)
+				->latest('analyzed_at')
+				->first();
+
+			if ($cachedAnalysis) {
+				return array_merge(
+					$cachedAnalysis->analysis_data,
+					[
+						'cached' => true,
+						'cached_at' => $cachedAnalysis->analyzed_at->format('Y-m-d H:i'),
+						'feedbacks_cached_count' => $cachedAnalysis->feedbacks_count,
+					]
+				);
+			}
+		}
+
+		$analysis = $this->analyzeGlobal($feedbacks, $sentimentStats, $context);
+
+		RadarAnalysis::create([
+			'company_id' => null,
+			'feedback_hash' => $feedbackHash,
+			'feedbacks_count' => count($feedbacks),
+			'feedbacks_with_comments' => $feedbacksWithComments,
+			'analysis_data' => $analysis,
+			'analyzed_at' => now(),
+		]);
+
+		return array_merge($analysis, ['cached' => false, 'forced' => $force]);
+	}
+
+	/**
 	 * Analyser les feedbacks avec cache intelligent
 	 * 
 	 * @param int $companyId - ID de la compagnie
@@ -71,6 +121,202 @@ class RadarAnalysisService
 			->implode(',');
 
 		return hash('sha256', $ids);
+	}
+
+	/**
+	 * Analyse IA dédiée au scope global.
+	 * Retourne un format structuré: signals + recommended_actions.
+	 */
+	public function analyzeGlobal(array $feedbacks, array $sentimentStats = [], array $context = []): array
+	{
+		if (empty($feedbacks)) {
+			return $this->fallbackGlobalAnalysis($sentimentStats, $context, 'Aucun feedback à analyser pour le moment.');
+		}
+
+		$prompt = $this->buildGlobalPrompt($feedbacks, $sentimentStats, $context);
+
+		try {
+			$apiKey = config('services.gemini.api_key');
+			$model = config('services.gemini.model') ?? 'models/gemini-2.5-flash:generateContent';
+
+			if (! $apiKey) {
+				return $this->fallbackGlobalAnalysis($sentimentStats, $context, 'Clé Gemini absente, analyse locale utilisée.');
+			}
+
+			$url = 'https://generativelanguage.googleapis.com/v1beta/' . $model
+				. '?key=' . urlencode($apiKey);
+
+			$response = Http::post($url, [
+				'contents' => [
+					[
+						'parts' => [
+							['text' => $prompt],
+						],
+					],
+				],
+			]);
+
+			if (! $response->successful()) {
+				return $this->fallbackGlobalAnalysis($sentimentStats, $context, 'Erreur Gemini API, analyse locale utilisée.');
+			}
+
+			$text = $response->json('candidates.0.content.parts.0.text');
+			$parsed = $this->extractJson($text);
+
+			if (! $parsed) {
+				return $this->fallbackGlobalAnalysis($sentimentStats, $context, 'Réponse IA non exploitable, analyse locale utilisée.');
+			}
+
+			$signals = is_array($parsed['signals'] ?? null) ? $parsed['signals'] : [];
+			$actions = is_array($parsed['recommended_actions'] ?? null) ? $parsed['recommended_actions'] : [];
+
+			return [
+				'status' => 'ok',
+				'scope' => 'global',
+				'summary' => $parsed['summary'] ?? 'Analyse IA globale disponible.',
+				'signals' => $signals,
+				'recommended_actions' => $actions,
+				'confidence' => $parsed['confidence'] ?? 'moyenne',
+				'context' => $context,
+				'model' => $model,
+				'note' => $parsed['note'] ?? null,
+			];
+		} catch (\Throwable $e) {
+			return $this->fallbackGlobalAnalysis($sentimentStats, $context, 'Exception IA, analyse locale utilisée.');
+		}
+	}
+
+	private function buildGlobalPrompt(array $feedbacks, array $sentimentStats, array $context): string
+	{
+		$entries = collect($feedbacks)
+			->take(180)
+			->map(function ($f, $index) {
+				$rating = $f['rating'] ?? 'N/A';
+				$comment = trim($f['comment'] ?? '');
+				$comment = $this->maskPii($comment);
+				$comment = mb_substr($comment, 0, 600);
+				return ($index + 1) . ") Note: {$rating}/5 | Commentaire: {$comment}";
+			})
+			->implode("\n");
+
+		$sentimentLine = ! empty($sentimentStats)
+			? "Sentiment: positif={$sentimentStats['positive']}, neutre={$sentimentStats['neutral']}, negatif={$sentimentStats['negative']}."
+			: '';
+
+		$kpis = $context['kpis'] ?? [];
+		$ops = $context['ops'] ?? [];
+		$period = $context['period'] ?? [];
+
+		$periodLine = (! empty($period['from']) && ! empty($period['to']))
+			? "Période: {$period['from']} → {$period['to']}."
+			: '';
+
+		$kpisLine = ! empty($kpis)
+			? 'KPIs: ' . json_encode($kpis, JSON_UNESCAPED_UNICODE)
+			: '';
+
+		$opsLine = ! empty($ops)
+			? 'Ops: ' . json_encode($ops, JSON_UNESCAPED_UNICODE)
+			: '';
+
+		return <<<PROMPT
+Tu es un analyste produit senior (SaaS B2B) chargé d'un Radar IA GLOBAL (multi-entreprises).
+
+Objectif: produire des INSIGHTS actionnables et différenciants.
+
+Règles:
+- Répondre uniquement en JSON valide.
+- Ne pas inventer de données. Utiliser uniquement les KPIs/Ops fournis + les feedbacks.
+- Ne pas inclure de données personnelles (emails, téléphones). Les commentaires sont déjà masqués.
+- Style: concis, professionnel, orienté décisions.
+
+Format JSON attendu:
+{
+  "summary": "...",
+  "signals": [
+    {"category": "risk|opportunity|ops", "title": "...", "detail": "...", "severity": "low|medium|high", "evidence_count": 0}
+  ],
+  "recommended_actions": [
+    {"title": "...", "detail": "...", "priority": "P0|P1|P2"}
+  ],
+  "confidence": "faible|moyenne|haute",
+  "note": "..."
+}
+
+$periodLine
+$sentimentLine
+$kpisLine
+$opsLine
+
+Feedbacks (échantillon):
+$entries
+PROMPT;
+	}
+
+	private function fallbackGlobalAnalysis(array $sentimentStats, array $context, string $note): array
+	{
+		$ops = $context['ops'] ?? [];
+		$signals = [];
+
+		if (! empty($sentimentStats)) {
+			$total = ($sentimentStats['positive'] ?? 0) + ($sentimentStats['neutral'] ?? 0) + ($sentimentStats['negative'] ?? 0);
+			if ($total > 0) {
+				$negRate = round((($sentimentStats['negative'] ?? 0) / $total) * 100, 1);
+				if ($negRate >= 25) {
+					$signals[] = [
+						'category' => 'risk',
+						'title' => 'Hausse de feedbacks négatifs',
+						'detail' => "Taux négatif estimé: {$negRate}%.",
+						'severity' => $negRate >= 40 ? 'high' : 'medium',
+						'evidence_count' => $sentimentStats['negative'] ?? 0,
+					];
+				}
+			}
+		}
+
+		$failed = (int) ($ops['failed_requests_30d'] ?? 0);
+		if ($failed > 0) {
+			$signals[] = [
+				'category' => 'ops',
+				'title' => 'Échecs d’envoi détectés',
+				'detail' => "{$failed} demandes en statut failed sur la période.",
+				'severity' => $failed >= 25 ? 'high' : 'medium',
+				'evidence_count' => $failed,
+			];
+		}
+
+		return [
+			'status' => 'fallback',
+			'scope' => 'global',
+			'summary' => 'Radar global: tendances calculées localement à partir des KPIs et signaux visibles.',
+			'signals' => $signals,
+			'recommended_actions' => [
+				[
+					'title' => 'Prioriser les signaux à fort impact',
+					'detail' => 'Traiter d’abord les risques et les incidents ops (P0), puis les opportunités.',
+					'priority' => 'P1',
+				],
+			],
+			'confidence' => 'faible',
+			'context' => $context,
+			'model' => null,
+			'note' => $note,
+		];
+	}
+
+	private function maskPii(string $text): string
+	{
+		if ($text === '') {
+			return $text;
+		}
+
+		// Emails
+		$text = preg_replace('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', '[email]', $text);
+
+		// Phone numbers (simple heuristic)
+		$text = preg_replace('/\+?[0-9][0-9\s().-]{7,}[0-9]/', '[phone]', $text);
+
+		return $text;
 	}
 
 	/**

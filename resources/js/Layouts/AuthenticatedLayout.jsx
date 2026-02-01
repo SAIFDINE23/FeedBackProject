@@ -6,17 +6,23 @@ export default function AuthenticatedLayout({ user, header, children }) {
     const [loading, setLoading] = useState(false);
 
     const navigation = [
-        { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: route().current('dashboard'), enabled: true },
-        { name: 'Radar IA', href: 'radar', icon: RadarIcon, current: route().current('radar'), enabled: true },
-        { name: 'Tâches', href: 'tasks.index', icon: TaskIcon, current: route().current('tasks.*'), enabled: true },
-        { name: 'Clients', href: 'customers.index', icon: UsersIcon, current: route().current('customers.*'), enabled: true },
-        { name: 'Ajouter un client', href: 'customers.create', icon: UserPlusIcon, current: route().current('customers.create'), enabled: true },
-        { name: 'Entreprise', href: 'company.edit', icon: BuildingIcon, current: route().current('company.*'), enabled: true },
-        { name: 'Feedbacks', href: 'feedbacks.index', icon: ChatIcon, current: route().current('feedbacks.*'), enabled: true },
-        { name: 'Design Feedback', href: 'feedback.design.edit', icon: PaletteIcon, current: route().current('feedback.design.*'), enabled: true },
-        { name: 'Analytics', href: '#', icon: ChartIcon, current: false, enabled: false },
-        { name: 'Paramètres', href: '#', icon: SettingsIcon, current: false, enabled: false },
+        { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: route().current('dashboard'), enabled: true, section: 'main' },
+        { name: 'Radar IA', href: 'radar', icon: RadarIcon, current: route().current('radar'), enabled: true, section: 'main', badge: 'NEW' },
+        { name: 'Tâches', href: 'tasks.index', icon: TaskIcon, current: route().current('tasks.*'), enabled: true, section: 'main' },
+        { name: 'Clients', href: 'customers.index', icon: UsersIcon, current: route().current('customers.*'), enabled: true, section: 'gestion' },
+        { name: 'Feedbacks', href: 'feedbacks.index', icon: ChatIcon, current: route().current('feedbacks.*'), enabled: true, section: 'gestion' },
+        { name: 'Entreprise', href: 'company.edit', icon: BuildingIcon, current: route().current('company.*'), enabled: true, section: 'config' },
+        { name: 'Design Feedback', href: 'feedback.design.edit', icon: PaletteIcon, current: route().current('feedback.design.*'), enabled: true, section: 'config' },
+        { name: 'Analytics', href: '#', icon: ChartIcon, current: false, enabled: false, section: 'future' },
+        { name: 'Paramètres', href: '#', icon: SettingsIcon, current: false, enabled: false, section: 'future' },
     ];
+
+    const sections = {
+        main: 'Principal',
+        gestion: 'Gestion',
+        config: 'Configuration',
+        future: 'Bientôt disponible'
+    };
 
     const handleLogout = () => {
         if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
@@ -63,74 +69,104 @@ export default function AuthenticatedLayout({ user, header, children }) {
 
             {/* Sidebar */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 
-                transform transition-transform duration-300 ease-in-out
+                fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
+                transform transition-transform duration-300 ease-in-out shadow-2xl
                 lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="flex items-center gap-3 px-6 py-4 border-b border-luminea-200">
-                        <Link href={route('dashboard')} className="flex items-center gap-3 hover:opacity-80 transition">
-                            <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto" />
-                            <div className="hidden sm:block">
-                                <h1 className="text-lg font-bold text-gray-900">LUMINEA</h1>
-                                <p className="text-xs text-gray-500">Platform</p>
+                    <div className="relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-violet-600/20 backdrop-blur-sm"></div>
+                        <Link href={route('dashboard')} className="relative flex items-center gap-3 px-6 py-6 hover:opacity-90 transition-opacity group">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-violet-600 rounded-xl blur-md opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                                <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto relative z-10" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-black text-white tracking-tight">LUMINEA</h1>
+                                <p className="text-xs text-indigo-300 font-medium">Intelligence Platform</p>
                             </div>
                         </Link>
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                        {navigation.map((item) => {
-                            if (!item.enabled) {
-                                return (
-                                    <div
-                                        key={item.name}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 cursor-not-allowed opacity-60"
-                                    >
-                                        <item.icon className="w-5 h-5 text-gray-300" />
-                                        {item.name}
-                                        <span className="ml-auto text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded">
-                                            Bientôt
-                                        </span>
-                                    </div>
-                                );
-                            }
-                            
+                    <nav className="flex-1 px-4 py-6 overflow-y-auto space-y-6">
+                        {Object.entries(sections).map(([sectionKey, sectionLabel]) => {
+                            const sectionItems = navigation.filter(item => item.section === sectionKey);
+                            if (sectionItems.length === 0) return null;
+
                             return (
-                                <Link
-                                    key={item.name}
-                                    href={route(item.href)}
-                                    className={`
-                                        flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
-                                        transition-colors duration-200
-                                        ${item.current 
-                                            ? 'bg-luminea-50 text-luminea-700' 
-                                            : 'text-gray-700 hover:bg-gray-50'
-                                        }
-                                    `}
-                                >
-                                    <item.icon className={`w-5 h-5 ${item.current ? 'text-luminea-600' : 'text-gray-400'}`} />
-                                    {item.name}
-                                </Link>
+                                <div key={sectionKey}>
+                                    <h3 className="px-4 mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                                        {sectionLabel}
+                                    </h3>
+                                    <div className="space-y-1">
+                                        {sectionItems.map((item) => {
+                                            if (!item.enabled) {
+                                                return (
+                                                    <div
+                                                        key={item.name}
+                                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 cursor-not-allowed opacity-40"
+                                                    >
+                                                        <item.icon className="w-5 h-5" />
+                                                        {item.name}
+                                                        <span className="ml-auto text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded-full">
+                                                            Bientôt
+                                                        </span>
+                                                    </div>
+                                                );
+                                            }
+                                            
+                                            return (
+                                                <Link
+                                                    key={item.name}
+                                                    href={route(item.href)}
+                                                    className={`
+                                                        relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold
+                                                        transition-all duration-200 group overflow-hidden
+                                                        ${item.current 
+                                                            ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/50' 
+                                                            : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                                                        }
+                                                    `}
+                                                >
+                                                    {item.current && (
+                                                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-violet-600/20 animate-pulse"></div>
+                                                    )}
+                                                    <item.icon className={`w-5 h-5 relative z-10 transition-transform group-hover:scale-110 ${item.current ? 'text-white' : ''}`} />
+                                                    <span className="relative z-10">{item.name}</span>
+                                                    {item.badge && (
+                                                        <span className="ml-auto relative z-10 text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
+                                                            {item.badge}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             );
                         })}
                     </nav>
 
                     {/* User & Logout */}
-                    <div className="border-t border-gray-200 p-4 space-y-2">
-                        <div className="flex items-center gap-3 px-4 py-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-luminea-400 to-luminea-700 rounded-full flex items-center justify-center">
-                                <span className="text-white font-semibold text-sm">
-                                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                                </span>
+                    <div className="relative border-t border-slate-700/50 p-4 space-y-2">
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent pointer-events-none"></div>
+                        <div className="relative flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/60 backdrop-blur-sm group hover:bg-slate-800 transition-colors">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-violet-600 rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-full flex items-center justify-center relative z-10 ring-2 ring-white/20">
+                                    <span className="text-white font-bold text-base">
+                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                    </span>
+                                </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
+                                <p className="text-sm font-semibold text-white truncate">
                                     {user?.name || 'Utilisateur'}
                                 </p>
-                                <p className="text-xs text-gray-500 truncate">
+                                <p className="text-xs text-slate-400 truncate">
                                     {user?.email || 'email@example.com'}
                                 </p>
                             </div>
@@ -138,34 +174,38 @@ export default function AuthenticatedLayout({ user, header, children }) {
                         
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 transition-colors duration-200"
+                            className="relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:text-white hover:bg-rose-600 transition-all duration-200 group overflow-hidden"
                         >
-                            <LogoutIcon className="w-5 h-5" />
-                            Déconnexion
+                            <div className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/50 to-rose-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                            <LogoutIcon className="w-5 h-5 relative z-10" />
+                            <span className="relative z-10">Déconnexion</span>
                         </button>
                     </div>
                 </div>
             </aside>
 
             {/* Main content */}
-            <div className="lg:pl-64">
+            <div className="lg:pl-72">
                 {/* Top header */}
-                <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+                <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/60 shadow-sm">
                     <div className="flex items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setSidebarOpen(true)}
-                                className="lg:hidden p-2 text-gray-500 hover:text-gray-700"
+                                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                             >
                                 <MenuIcon className="w-6 h-6" />
                             </button>
-                            <h2 className="text-xl font-bold text-gray-900">{header}</h2>
+                            <div>
+                                <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">{header}</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Gestion intelligente de feedbacks</p>
+                            </div>
                         </div>
                         
-                        <div className="flex items-center gap-4">
-                            <button className="p-2 text-gray-400 hover:text-gray-600 relative">
+                        <div className="flex items-center gap-3">
+                            <button className="relative p-2.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all group">
                                 <BellIcon className="w-6 h-6" />
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-br from-rose-500 to-rose-600 rounded-full ring-2 ring-white animate-pulse"></span>
                             </button>
                         </div>
                     </div>
