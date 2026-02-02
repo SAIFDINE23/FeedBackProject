@@ -141,15 +141,15 @@ class FeedbackRequestController extends Controller
                 );
 
 
-                Log::info('Twilio response', $sms);
+                Log::info('Brevo response', $sms);
 
                 // 📦 Tracking provider
                 $feedbackRequest->update([
-                    'status'              => 'sent',
-                    'sent_at'             => now(),
-                    'provider'             => 'twilio',
-                    'provider_message_id'  => $sms['sid'] ?? null,
-                    'provider_response'    => json_encode($sms),
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                    'provider' => 'brevo',
+                    'provider_message_id' => $sms['messageId'] ?? null,
+                    'provider_response' => json_encode($sms),
                 ]);
 
             } catch (\Throwable $e) {
@@ -157,7 +157,7 @@ class FeedbackRequestController extends Controller
                     'status' => 'failed',
                 ]);
 
-                Log::error('Twilio SMS FAILED', [
+                Log::error('Brevo SMS FAILED', [
                     'to' => $feedbackRequest->customer->phone,
                     'error' => $e->getMessage(),
                 ]);
@@ -276,8 +276,8 @@ class FeedbackRequestController extends Controller
                         $feedbackRequest->update([
                             'status' => 'sent',
                             'sent_at' => now(),
-                            'provider' => 'twilio',
-                            'provider_message_id' => $sms['sid'] ?? null,
+                            'provider' => 'brevo',
+                            'provider_message_id' => $sms['messageId'] ?? null,
                             'provider_response' => json_encode($sms),
                         ]);
 

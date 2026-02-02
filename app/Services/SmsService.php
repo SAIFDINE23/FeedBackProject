@@ -2,30 +2,38 @@
 
 namespace App\Services;
 
-use Twilio\Rest\Client;
+use Illuminate\Support\Facades\Http;
 
 class SmsService
 {
-    protected Client $client;
-
-    public function __construct()
-    {
-        $this->client = new Client(
-            config('services.twilio.sid'),
-            config('services.twilio.token')
-        );
-    }
-
     public function send(string $to, string $message): array
     {
-        $sms = $this->client->messages->create($to, [
-            'from' => config('services.twilio.from'),
-            'body' => $message,
+        $apiKey = config('services.brevo.api_key');
+        $sender = config('services.brevo.sms_sender');
+
+        if (empty($apiKey) || empty($sender)) {
+            throw new \RuntimeException('Brevo SMS config manquante (BREVO_API_KEY ou BREVO_SMS_SENDER).');
+        }
+
+        $response = Http::withHeaders([
+            'api-key' => $apiKey,
+            'accept' => 'application/json',
+            'content-type' => 'application/json',
+        ])->post('https://api.brevo.com/v3/transactionalSMS/sms', [
+            'sender' => $sender,
+            'recipient' => $to,
+            'content' => $message,
+            'type' => 'transactional',
         ]);
 
+        if (!$response->successful()) {
+            throw new \RuntimeException('Brevo SMS error: ' . $response->body());
+        }
+
         return [
-            'sid' => $sms->sid,
-            'status' => $sms->status,
+            'messageId' => $response->json('messageId'),
+            'status' => $response->status(),
+            'response' => $response->json(),
         ];
     }
 }

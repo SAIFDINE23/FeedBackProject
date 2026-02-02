@@ -36,11 +36,17 @@ return [
     ],
 
     'twilio' => [
-    'sid'   => env('TWILIO_SID'),
-    'token' => env('TWILIO_AUTH_TOKEN'),
-    'from'  => env('TWILIO_FROM'),
-],
-'gemini' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
+    'brevo' => [
+        'api_key' => env('BREVO_API_KEY'),
+        'sms_sender' => env('BREVO_SMS_SENDER'),
+    ],
+
+    'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL'),
     ],
