@@ -31,7 +31,7 @@ class SettingsController extends Controller
     }
 
     /**
-     * Met à jour les informations du profil(password)
+     * Met à jour les informations du profil(password + name)
      */
     public function updateProfile(Request $request)
     {
