@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('review_platforms', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->string('platform_name'); // google, trustpilot, tripadvisor, etc.
+            $table->string('platform_url')->nullable();
+            $table->boolean('is_active')->default(false);
+            $table->timestamps();
+
+            $table->unique(['company_id', 'platform_name']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('review_platforms');
+    }
+};

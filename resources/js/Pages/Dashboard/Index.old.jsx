@@ -1,11 +1,8 @@
 import { router, Link } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { QrCode, Download } from 'lucide-react';
-import { useState } from 'react';
 
-export default function Index({ auth, stats, recentFeedbacks, feedbackTrend, globalQRCode }) {
-    const [qrModalOpen, setQrModalOpen] = useState(false);
+export default function Index({ auth, stats, recentFeedbacks, feedbackTrend }) {
     const getInsight = () => {
         if (stats.response_rate >= 80) {
             return {
@@ -33,17 +30,6 @@ export default function Index({ auth, stats, recentFeedbacks, feedbackTrend, glo
             title: 'Opportunité de croissance',
             message: 'Améliorez la collecte des feedbacks et la rapidité des réponses.',
         };
-    };
-
-    const downloadGlobalQR = () => {
-        if (!globalQRCode) return;
-        
-        const link = document.createElement('a');
-        link.href = globalQRCode;
-        link.download = 'qr-feedback-global.svg';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     };
 
     const insight = getInsight();
@@ -116,90 +102,6 @@ export default function Index({ auth, stats, recentFeedbacks, feedbackTrend, glo
                         <p className="mt-4 text-base text-indigo-100/90 font-medium">{insight.message}</p>
                     </div>
                 </div>
-
-                {/* Global QR Code Section */}
-                {globalQRCode && (
-                    <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 p-8">
-                        <div className="grid md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <h2 className="text-3xl font-black text-gray-900 mb-3 flex items-center gap-2">
-                                    <QrCode className="w-8 h-8 text-blue-900" />
-                                    QR Code Global
-                                </h2>
-                                <p className="text-gray-600 font-medium mb-4">
-                                    Partagez ce QR code avec vos clients pour qu'ils puissent facilement laisser un feedback sans être lié à un client spécifique.
-                                </p>
-                                <p className="text-sm text-gray-500 mb-6">
-                                    Les feedbacks collectés seront créés comme nouveaux clients dans votre base de données.
-                                </p>
-                                <button
-                                    onClick={() => setQrModalOpen(true)}
-                                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-900 text-white font-bold rounded-xl hover:bg-blue-800 transition-all"
-                                >
-                                    <QrCode className="w-5 h-5" />
-                                    Voir le QR Code
-                                </button>
-                            </div>
-                            <div className="flex justify-center">
-                                <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-                                    <img 
-                                        src={globalQRCode} 
-                                        alt="QR Code Global"
-                                        className="w-48 h-48"
-                                    />
-                                    <button
-                                        onClick={downloadGlobalQR}
-                                        className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition-all text-sm"
-                                    >
-                                        <Download className="w-4 h-4" />
-                                        Télécharger
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* QR Modal */}
-                {qrModalOpen && globalQRCode && (
-                    <div 
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-                        onClick={() => setQrModalOpen(false)}
-                    >
-                        <div 
-                            className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border-2 border-gray-200"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <h3 className="text-2xl font-black text-gray-900 mb-6">
-                                QR Code Global
-                            </h3>
-
-                            <div className="flex justify-center mb-6 bg-gray-50 p-6 rounded-xl">
-                                <img 
-                                    src={globalQRCode} 
-                                    alt="QR Code Global"
-                                    className="w-64 h-64"
-                                />
-                            </div>
-
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={downloadGlobalQR}
-                                    className="flex-1 py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold transition-all flex items-center justify-center gap-2"
-                                >
-                                    <Download className="w-5 h-5" />
-                                    Télécharger
-                                </button>
-                                <button
-                                    onClick={() => setQrModalOpen(false)}
-                                    className="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-all"
-                                >
-                                    Fermer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

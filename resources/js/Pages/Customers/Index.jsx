@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, Link } from '@inertiajs/react';
-import { Mail, MessageSquare, QrCode, Smartphone, Send, Trash2, Users, CheckSquare } from 'lucide-react';
+import { Mail, MessageSquare, QrCode, Smartphone, Send, Trash2, Users, CheckSquare, Eye, Download, Edit } from 'lucide-react';
 
 export default function Index({ auth, customers }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -9,6 +9,11 @@ export default function Index({ auth, customers }) {
     const [channelMenuVisible, setChannelMenuVisible] = useState(false);
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const [bulkChannelMenuVisible, setBulkChannelMenuVisible] = useState(false);
+    const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [selectedCustomerForQR, setSelectedCustomerForQR] = useState(null);
+    const [qrImageData, setQrImageData] = useState(null);
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+    const [selectedCustomerForDetails, setSelectedCustomerForDetails] = useState(null);
 
     const openChannelMenu = (customer) => {
         setSelectedCustomer(customer);
@@ -59,6 +64,39 @@ export default function Index({ auth, customers }) {
     const deleteCustomer = (id, name) => {
         if (!confirm(`Supprimer ${name} ?`)) return;
         router.delete(route('customers.destroy', id), { preserveScroll: true });
+    };
+
+    const handleQRClick = async (customer) => {
+        setSelectedCustomerForQR(customer);
+        setQrImageData(customer.qr_code_data || null);
+        setQrModalOpen(true);
+    };
+
+    const generateQRCodeDataURL = (customer) => {
+        // Créer ou récupérer le dernier feedback request
+        const feedbackRequest = customer.feedback_requests?.[0];
+        if (!feedbackRequest || !feedbackRequest.token) {
+            return null;
+        }
+        
+        // Utiliser la route côté serveur pour générer le QR
+        return route('customers.qr', customer.id);
+    };
+
+    const downloadQR = (customer) => {
+        if (!customer.qr_code_data) return;
+        
+        const link = document.createElement('a');
+        link.href = customer.qr_code_data;
+        link.download = `qr-customer-${customer.id}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleDetailsClick = (customer) => {
+        setSelectedCustomerForDetails(customer);
+        setDetailsModalOpen(true);
     };
 
     const filteredCustomers = customers.filter(c =>
@@ -216,8 +254,32 @@ export default function Index({ auth, customers }) {
                                             <td className="px-6 py-5 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button
+                                                        onClick={() => handleDetailsClick(customer)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-xl hover:bg-blue-800 transition-all font-bold text-sm hover:scale-105"
+                                                        title="Voir les détails"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                        Voir
+                                                    </button>
+                                                    <Link
+                                                        href={route('customers.edit', customer.id)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-all font-bold text-sm hover:scale-105"
+                                                        title="Modifier"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                        Modifier
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleQRClick(customer)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-500 transition-all font-bold text-sm hover:scale-105"
+                                                        title="QR Code"
+                                                    >
+                                                        <QrCode className="w-4 h-4" />
+                                                        QR
+                                                    </button>
+                                                    <button
                                                         onClick={() => openChannelMenu(customer)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:shadow-lg transition-all font-bold text-sm hover:scale-105"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold text-sm hover:scale-105"
                                                     >
                                                         <Send className="w-4 h-4" />
                                                         Envoyer
@@ -289,6 +351,178 @@ export default function Index({ auth, customers }) {
                         >
                             Annuler
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal QR Code */}
+            {qrModalOpen && selectedCustomerForQR && (
+                <div 
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+                    onClick={() => setQrModalOpen(false)}
+                >
+                    <div 
+                        className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border-2 border-gray-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-2xl font-black text-gray-900 mb-2">
+                            QR Code
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-6 font-medium">
+                            QR Code pour <span className="font-black text-blue-900">{selectedCustomerForQR.name || selectedCustomerForQR.email}</span>
+                        </p>
+
+                        <div className="flex justify-center mb-6">
+                            {qrImageData ? (
+                                <img 
+                                    src={qrImageData} 
+                                    alt="QR Code"
+                                    className="w-64 h-64 border-2 border-gray-200 rounded-xl"
+                                />
+                            ) : (
+                                <div className="w-64 h-64 border-2 border-gray-200 rounded-xl flex items-center justify-center bg-gray-50">
+                                    <div className="text-center">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mx-auto mb-3"></div>
+                                        <p className="text-sm text-gray-600 font-medium">Génération du QR Code...</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => downloadQR(selectedCustomerForQR)}
+                                className="flex-1 py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold transition-all flex items-center justify-center gap-2"
+                                disabled={!qrImageData}
+                            >
+                                <Download className="w-5 h-5" />
+                                Télécharger
+                            </button>
+                            <button
+                                onClick={() => setQrModalOpen(false)}
+                                className="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-all"
+                            >
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Détails Client */}
+            {detailsModalOpen && selectedCustomerForDetails && (
+                <div 
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+                    onClick={() => setDetailsModalOpen(false)}
+                >
+                    <div 
+                        className="bg-white rounded-3xl p-8 w-full max-w-2xl shadow-2xl border-2 border-gray-200 max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-2xl font-black text-gray-900 mb-6">
+                            Détails du client
+                        </h3>
+
+                        <div className="space-y-6">
+                            {/* Informations principales */}
+                            <div className="bg-gradient-to-br from-blue-50 to-gray-50 rounded-2xl p-6 border-2 border-blue-100">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-700 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                                        {selectedCustomerForDetails.name?.charAt(0).toUpperCase() || selectedCustomerForDetails.email?.charAt(0).toUpperCase() || '?'}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-black text-gray-900">
+                                            {selectedCustomerForDetails.name || 'Sans nom'}
+                                        </h4>
+                                        <p className="text-sm text-gray-600 font-medium">
+                                            Client ID: #{selectedCustomerForDetails.id}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase mb-1">Email</p>
+                                        <p className="text-sm font-bold text-gray-900">{selectedCustomerForDetails.email || 'Non renseigné'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase mb-1">Téléphone</p>
+                                        <p className="text-sm font-bold text-gray-900">{selectedCustomerForDetails.phone || 'Non renseigné'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase mb-1">Créé le</p>
+                                        <p className="text-sm font-bold text-gray-900">
+                                            {new Date(selectedCustomerForDetails.created_at).toLocaleDateString('fr-FR', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-500 uppercase mb-1">Mis à jour le</p>
+                                        <p className="text-sm font-bold text-gray-900">
+                                            {new Date(selectedCustomerForDetails.updated_at).toLocaleDateString('fr-FR', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Historique des feedbacks */}
+                            <div>
+                                <h4 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+                                    <MessageSquare className="w-5 h-5 text-blue-900" />
+                                    Historique des demandes de feedback
+                                </h4>
+                                
+                                {selectedCustomerForDetails.feedback_requests && selectedCustomerForDetails.feedback_requests.length > 0 ? (
+                                    <div className="space-y-3">
+                                        {selectedCustomerForDetails.feedback_requests.map((request, index) => (
+                                            <div key={request.id || index} className="bg-white border-2 border-gray-200 rounded-xl p-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-sm font-bold text-gray-700">
+                                                        {new Date(request.created_at).toLocaleDateString('fr-FR', {
+                                                            year: 'numeric',
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </span>
+                                                    {statusBadge(request.status)}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                                    <span className="font-bold">Canal:</span>
+                                                    <span className="px-2 py-1 bg-gray-100 rounded-lg font-bold uppercase">
+                                                        {request.channel || 'Non spécifié'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
+                                        <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                                        <p className="text-sm text-gray-600 font-medium">
+                                            Aucune demande de feedback pour ce client
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="mt-6">
+                            <button
+                                onClick={() => setDetailsModalOpen(false)}
+                                className="w-full py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-all"
+                            >
+                                Fermer
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

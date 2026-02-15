@@ -13,6 +13,8 @@ use App\Http\Controllers\{
     FeedbackRequestController,
     ProfileController,
     FeedbackReplyController,
+    ReviewPlatformController,
+    SettingsController,
     TaskController
 };
 use App\Http\Controllers\Admin\AdminController;
@@ -41,11 +43,26 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
+Route::get('/feedback', [FeedbackController::class, 'showPublic'])
+    ->name('feedback.public');
+
+Route::post('/feedback', [FeedbackController::class, 'storePublic'])
+    ->name('feedback.storePublic');
+
 Route::get('/feedback/{token}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
 
 Route::post('/feedback/{token}', [FeedbackController::class, 'store'])
     ->name('feedback.store');
+
+// QR Code generation (needs auth but with special handling for img tags)
+Route::get('/customers/{customer}/qr', [CustomerController::class, 'qrCode'])
+    ->middleware(['auth'])
+    ->name('customers.qr');
+
+Route::get('/feedback-requests/{feedbackRequest}/qr', [FeedbackRequestController::class, 'qrCode'])
+    ->middleware(['auth'])
+    ->name('feedback-requests.qr');
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +141,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/customers', [CustomerController::class, 'store'])
         ->name('customers.store');
+    
+    Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])
+        ->name('customers.edit');
+    
+    Route::put('/customers/{customer}', [CustomerController::class, 'update'])
+        ->name('customers.update');
+    
     Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])
     ->name('customers.destroy');
 
@@ -136,6 +160,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::put('/company/settings', [CompanyController::class, 'update'])
         ->name('company.update');
+
+    /*
+    | Review Platforms
+    */
+    Route::get('/review-platforms', [ReviewPlatformController::class, 'index'])
+        ->name('review-platforms.index');
+    
+    Route::post('/review-platforms', [ReviewPlatformController::class, 'upsert'])
+        ->name('review-platforms.upsert');
+
+    /*
+    | Settings
+    */
+    Route::get('/settings', [SettingsController::class, 'index'])
+        ->name('settings.index');
+    
+    Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])
+        ->name('settings.profile.update');
+    
+    Route::patch('/settings/password', [SettingsController::class, 'updatePassword'])
+        ->name('settings.password.update');
+    
+    Route::delete('/settings/account', [SettingsController::class, 'destroy'])
+        ->name('settings.account.destroy');
 
     /*
     | Feedback requests (send / resend)

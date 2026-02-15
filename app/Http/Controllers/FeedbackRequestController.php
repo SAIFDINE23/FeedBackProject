@@ -324,4 +324,33 @@ class FeedbackRequestController extends Controller
         }
 
         return back()->with('success', $message);
-    }}
+    }
+
+    /**
+     * Générer un QR code pour une demande de feedback
+     */
+    public function qrCode(FeedbackRequest $feedbackRequest)
+    {
+        // Vérifier que l'utilisateur a accès à cette demande
+        if ($feedbackRequest->company_id !== Auth::user()->company->id) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        // Générer l'URL du formulaire de feedback
+        $url = route('feedback.show', ['token' => $feedbackRequest->token]);
+
+        // Créer le QR code (v6 utilise readonly class avec constructeur)
+        $qrCode = new \Endroid\QrCode\QrCode(
+            data: $url,
+            size: 300,
+            margin: 10
+        );
+
+        $writer = new \Endroid\QrCode\Writer\SvgWriter();
+        $result = $writer->write($qrCode);
+
+        // Retourner l'image
+        return response($result->getString())
+            ->header('Content-Type', $result->getMimeType());
+    }
+}

@@ -8,12 +8,12 @@ function SkeletonLoader() {
             {/* Header avec actions */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <div className="h-8 bg-gray-200 rounded-lg w-64 mb-2"></div>
+                    <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-64 mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-48"></div>
                 </div>
                 <div className="flex gap-3">
                     <div className="h-10 bg-gray-200 rounded-xl w-32"></div>
-                    <div className="h-10 bg-blue-100 rounded-xl w-40"></div>
+                    <div className="h-10 bg-gradient-to-r from-indigo-200 to-violet-200 rounded-xl w-40"></div>
                 </div>
             </div>
 
@@ -22,7 +22,7 @@ function SkeletonLoader() {
                 {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 bg-blue-50 rounded-xl"></div>
+                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-200 to-violet-200 rounded-xl"></div>
                             <div className="h-6 bg-gray-200 rounded w-12"></div>
                         </div>
                         <div className="space-y-2">
@@ -48,7 +48,7 @@ function SkeletonLoader() {
                             <div className="h-8 bg-gray-200 rounded w-16"></div>
                         </div>
                     </div>
-                    <div className="h-72 bg-gray-100 rounded-xl"></div>
+                    <div className="h-72 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl"></div>
                 </div>
 
                 {/* Sidebar stats */}
@@ -125,11 +125,10 @@ export default function AuthenticatedLayout({ user, header, children }) {
         { name: 'Tâches', href: 'tasks.index', icon: TaskIcon, current: route().current('tasks.*'), enabled: true, section: 'main' },
         { name: 'Clients', href: 'customers.index', icon: UsersIcon, current: route().current('customers.*'), enabled: true, section: 'gestion' },
         { name: 'Feedbacks', href: 'feedbacks.index', icon: ChatIcon, current: route().current('feedbacks.*'), enabled: true, section: 'gestion' },
-        { name: "Plateformes d'avis", href: 'review-platforms.index', icon: StarIcon, current: route().current('review-platforms.*'), enabled: true, section: 'gestion' },
         { name: 'Entreprise', href: 'company.edit', icon: BuildingIcon, current: route().current('company.*'), enabled: true, section: 'config' },
         { name: 'Design Feedback', href: 'feedback.design.edit', icon: PaletteIcon, current: route().current('feedback.design.*'), enabled: true, section: 'config' },
-        { name: 'Paramètres', href: 'settings.index', icon: SettingsIcon, current: route().current('settings.*'), enabled: true, section: 'config' },
         { name: 'Analytics', href: '#', icon: ChartIcon, current: false, enabled: false, section: 'future' },
+        { name: 'Paramètres', href: '#', icon: SettingsIcon, current: false, enabled: false, section: 'future' },
     ];
 
     const sections = {
@@ -170,21 +169,23 @@ export default function AuthenticatedLayout({ user, header, children }) {
 
             {/* Sidebar */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200
-                transform transition-transform duration-300 ease-in-out shadow-lg
+                fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
+                transform transition-transform duration-300 ease-in-out shadow-2xl
                 lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="relative overflow-hidden border-b border-gray-200">
-                        <Link href={route('dashboard')} className="relative flex items-center gap-4 px-6 py-6 hover:bg-gray-50 transition-colors group">
-                            <div className="relative flex-shrink-0">
-                                <img src="/images/logo_Luminea1.png" alt="Luminea" className="h-16 w-auto relative z-10" />
+                    <div className="relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-violet-600/20 backdrop-blur-sm"></div>
+                        <Link href={route('dashboard')} className="relative flex items-center gap-3 px-6 py-6 hover:opacity-90 transition-opacity group">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-violet-600 rounded-xl blur-md opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                                <img src="/images/logo_Luminea.png" alt="Luminea" className="h-12 w-auto relative z-10" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-black text-gray-900 tracking-tight">LUMINEA</h1>
-                                <p className="text-xs text-gray-600 font-medium">Intelligence Platform</p>
+                                <h1 className="text-xl font-black text-white tracking-tight">LUMINEA</h1>
+                                <p className="text-xs text-indigo-300 font-medium">Intelligence Platform</p>
                             </div>
                         </Link>
                     </div>
@@ -197,7 +198,7 @@ export default function AuthenticatedLayout({ user, header, children }) {
 
                             return (
                                 <div key={sectionKey}>
-                                    <h3 className="px-4 mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+                                    <h3 className="px-4 mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                                         {sectionLabel}
                                     </h3>
                                     <div className="space-y-1">
@@ -206,11 +207,11 @@ export default function AuthenticatedLayout({ user, header, children }) {
                                                 return (
                                                     <div
                                                         key={item.name}
-                                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 cursor-not-allowed opacity-40"
+                                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 cursor-not-allowed opacity-40"
                                                     >
                                                         <item.icon className="w-5 h-5" />
                                                         {item.name}
-                                                        <span className="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                                                        <span className="ml-auto text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded-full">
                                                             Bientôt
                                                         </span>
                                                     </div>
@@ -223,17 +224,20 @@ export default function AuthenticatedLayout({ user, header, children }) {
                                                     href={route(item.href)}
                                                     className={`
                                                         relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold
-                                                        transition-all duration-150 group
+                                                        transition-all duration-200 group overflow-hidden
                                                         ${item.current 
-                                                            ? 'bg-blue-900 text-white shadow-sm' 
-                                                            : 'text-gray-700 hover:text-blue-900 hover:bg-blue-50'
+                                                            ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/50' 
+                                                            : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                                                         }
                                                     `}
                                                 >
-                                                    <item.icon className="w-5 h-5 relative z-10 transition-transform duration-150 group-hover:scale-110" />
+                                                    {item.current && (
+                                                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-violet-600/20 animate-pulse"></div>
+                                                    )}
+                                                    <item.icon className={`w-5 h-5 relative z-10 transition-transform group-hover:scale-110 ${item.current ? 'text-white' : ''}`} />
                                                     <span className="relative z-10">{item.name}</span>
                                                     {item.badge && (
-                                                        <span className="ml-auto relative z-10 text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-full font-bold">
+                                                        <span className="ml-auto relative z-10 text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
                                                             {item.badge}
                                                         </span>
                                                     )}
@@ -247,20 +251,22 @@ export default function AuthenticatedLayout({ user, header, children }) {
                     </nav>
 
                     {/* User & Logout */}
-                    <div className="relative border-t border-gray-200 p-4 space-y-2">
-                        <div className="relative flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 group hover:bg-gray-100 transition-colors duration-150">
+                    <div className="relative border-t border-slate-700/50 p-4 space-y-2">
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent pointer-events-none"></div>
+                        <div className="relative flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/60 backdrop-blur-sm group hover:bg-slate-800 transition-colors">
                             <div className="relative">
-                                <div className="w-11 h-11 bg-blue-900 rounded-full flex items-center justify-center relative z-10 ring-2 ring-blue-100">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-violet-600 rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-full flex items-center justify-center relative z-10 ring-2 ring-white/20">
                                     <span className="text-white font-bold text-base">
                                         {user?.name?.charAt(0).toUpperCase() || 'U'}
                                     </span>
                                 </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 truncate">
+                                <p className="text-sm font-semibold text-white truncate">
                                     {user?.name || 'Utilisateur'}
                                 </p>
-                                <p className="text-xs text-gray-600 truncate">
+                                <p className="text-xs text-slate-400 truncate">
                                     {user?.email || 'email@example.com'}
                                 </p>
                             </div>
@@ -268,8 +274,9 @@ export default function AuthenticatedLayout({ user, header, children }) {
                         
                         <button
                             onClick={handleLogout}
-                            className="relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:text-white hover:bg-red-600 transition-all duration-150 group"
+                            className="relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:text-white hover:bg-rose-600 transition-all duration-200 group overflow-hidden"
                         >
+                            <div className="absolute inset-0 bg-gradient-to-r from-rose-600/0 via-rose-600/50 to-rose-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                             <LogoutIcon className="w-5 h-5 relative z-10" />
                             <span className="relative z-10">Déconnexion</span>
                         </button>
@@ -290,15 +297,15 @@ export default function AuthenticatedLayout({ user, header, children }) {
                                 <MenuIcon className="w-6 h-6" />
                             </button>
                             <div>
-                                <h2 className="text-xl font-bold text-gray-900">{header}</h2>
-                                <p className="text-xs text-gray-600 mt-0.5">Gestion intelligente de feedbacks</p>
+                                <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">{header}</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">Gestion intelligente de feedbacks</p>
                             </div>
                         </div>
                         
                         <div className="flex items-center gap-3">
-                            <button className="relative p-2.5 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-xl transition-all group">
+                            <button className="relative p-2.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all group">
                                 <BellIcon className="w-6 h-6" />
-                                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
+                                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-br from-rose-500 to-rose-600 rounded-full ring-2 ring-white animate-pulse"></span>
                             </button>
                         </div>
                     </div>
@@ -425,14 +432,6 @@ function PaletteIcon({ className }) {
     return (
         <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-        </svg>
-    );
-}
-
-function StarIcon({ className }) {
-    return (
-        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
     );
 }

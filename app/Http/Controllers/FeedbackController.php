@@ -48,6 +48,113 @@ class FeedbackController extends Controller
     }
 
     /**
+     * Page feedback public - formulaire de feedback global
+     */
+    public function showPublic()
+    {
+        // Récupérer la première company (ou adapter selon votre logique)
+        // Pour un formulaire vraiment global, on peut laisser le client choisir sa company
+        $companies = \App\Models\Company::all();
+
+        if ($companies->isEmpty()) {
+            return Inertia::render('Feedback/NotFound', [
+                'message' => 'Aucune company disponible',
+            ]);
+        }
+
+        // Valeurs par défaut
+        $defaultSettings = [
+            'primary_color' => '#3b82f6',
+            'secondary_color' => '#1e40af',
+            'star_style' => 'classic',
+            'star_color' => '#fbbf24',
+            'font_family' => 'Inter',
+            'background_color' => '#f9fafb',
+            'card_background' => '#ffffff',
+            'text_color' => '#111827',
+            'button_style' => 'rounded',
+            'show_logo' => true,
+            'custom_message' => 'Votre avis compte pour nous!',
+        ];
+
+        return Inertia::render('Feedback/CreatePublic', [
+            'postUrl' => route('feedback.storePublic'),
+            'companies' => $companies->map(fn($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'logo_url' => $c->logo_url,
+                'design_settings' => $c->design_settings ?? $defaultSettings,
+            ]),
+        ]);
+    }
+
+    /**
+     * Soumission du feedback global
+     */
+    public function storePublic(Request $request)
+    {
+        $request->validate([
+            'company_id' => ['required', 'exists:companies,id'],
+            'email' => ['required', 'email'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'rating' => ['required', 'integer', 'between:1,5'],
+            'comment' => ['nullable', 'string'],
+        ]);
+
+        $company = \App\Models\Company::findOrFail($request->company_id);
+
+        // Créer ou récupérer le customer
+        $customer = \App\Models\Customer::firstOrCreate(
+            [
+                'company_id' => $company->id,
+                'email' => $request->email,
+            ],
+            [
+                'name' => $request->name,
+                'phone' => null,
+            ]
+        );
+
+        // Créer le feedback request
+        $feedbackRequest = $customer->feedbackRequests()->create([
+            'company_id' => $company->id,
+            'token' => \Illuminate\Support\Str::uuid(),
+            'channel' => 'qr',
+            'status' => 'completed',
+        ]);
+
+        // Créer le feedback
+        $feedback = Feedback::create([
+            'feedback_request_id' => $feedbackRequest->id,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        // Récupérer les plateformes actives si rating > 3
+        $activePlatforms = [];
+        if ($request->rating > 3) {
+            $activePlatforms = \App\Models\ReviewPlatform::where('company_id', $company->id)
+                ->where('is_active', true)
+                ->whereNotNull('platform_url')
+                ->get()
+                ->map(fn($p) => [
+                    'name' => ucfirst($p->platform_name),
+                    'url' => $p->platform_url,
+                ])
+                ->toArray();
+        }
+
+        return Inertia::render('Feedback/ThankYou', [
+            'rating' => $request->rating,
+            'activePlatforms' => $activePlatforms,
+            'company' => [
+                'name' => $company->name,
+                'logo_url' => $company->logo_url,
+            ],
+        ]);
+    }
+
+    /**
      * Page feedback (client – via token)
      */
     public function show(string $token)
@@ -131,16 +238,23 @@ class FeedbackController extends Controller
         // 🤖 Lance le Job de génération de réponse IA (multilingue)
         dispatch(new GenerateAIReplyJob($feedback));
 
-        // ✅ Logique Google Reviews
-        $googleUrl = null;
-
-        if ($feedback->rating >= 4) {
-            $googleUrl = $feedbackRequest->company->google_review_url;
+        // Récupérer les plateformes actives si rating > 3
+        $activePlatforms = [];
+        if ($feedback->rating > 3) {
+            $activePlatforms = \App\Models\ReviewPlatform::where('company_id', $feedbackRequest->company_id)
+                ->where('is_active', true)
+                ->whereNotNull('platform_url')
+                ->get()
+                ->map(fn($p) => [
+                    'name' => ucfirst($p->platform_name),
+                    'url' => $p->platform_url,
+                ])
+                ->toArray();
         }
 
         return Inertia::render('Feedback/ThankYou', [
             'rating'    => $feedback->rating,
-            'googleUrl' => $googleUrl,
+            'activePlatforms' => $activePlatforms,
             'company'   => $feedbackRequest->company->name,
         ]);
     }

@@ -16,6 +16,8 @@ class DashboardController extends Controller
     public function index()
     {
         $company = Auth::user()->company;
+        $globalQRCode = $this->generateGlobalQRCode();
+        
         $customers = Customer::where('company_id', $company->id)
         ->withCount([
         'feedbackRequests as total_feedbacks',
@@ -147,6 +149,7 @@ class DashboardController extends Controller
             'customers' => $customers,
             'recentFeedbacks' => $feedbacks,
             'feedbackTrend' => $feedbackTrend,
+            'globalQRCode' => $globalQRCode,
         ]);
     }
 
@@ -184,7 +187,9 @@ class DashboardController extends Controller
 
     public function exportRadar(Request $request)
     {
-        $company = Auth::user()->company;
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $company = $user->company;
 
         if (! $company) {
             abort(403);
@@ -192,13 +197,27 @@ class DashboardController extends Controller
 
         $days = (int) $request->query('days', 30);
         $days = max(7, min($days, 90));
+        
+        $format = $request->query('format', 'csv'); // csv ou pdf
 
         $data = $this->buildRadarData($company, $days);
+        
+        if ($format === 'pdf') {
+            return $this->exportRadarPDF($company, $data, $days);
+        }
 
+        return $this->exportRadarCSV($company, $data);
+    }
+
+    private function exportRadarCSV($company, $data)
+    {
         $filename = 'radar-ia-' . $company->id . '-' . now()->format('Ymd_His') . '.csv';
 
         return response()->streamDownload(function () use ($data) {
             $output = fopen('php://output', 'w');
+            
+            // Ajouter le BOM UTF-8 pour Windows/Excel
+            fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
             fputcsv($output, ['Radar IA Export']);
             fputcsv($output, ['Période', $data['period']['from'] . ' → ' . $data['period']['to']]);
@@ -290,6 +309,20 @@ class DashboardController extends Controller
         }, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    private function exportRadarPDF($company, $data, $days)
+    {
+        $filename = 'radar-ia-' . $company->id . '-' . now()->format('Ymd_His') . '.pdf';
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.radar', [
+            'company' => $company,
+            'data' => $data,
+            'days' => $days,
+            'generatedAt' => now()->format('d/m/Y H:i'),
+        ]);
+        
+        return $pdf->download($filename);
     }
 
     private function buildRadarData($company, int $days): array
@@ -770,5 +803,31 @@ class DashboardController extends Controller
         }
 
         return round($sorted[$mid], 1);
+    }
+
+    /**
+     * Générer QR code global en base64 (SVG)
+     */
+    private function generateGlobalQRCode()
+    {
+        try {
+            // URL publique du formulaire de feedback global
+            $url = route('feedback.public');
+
+            // Créer le QR code (v6 utilise readonly class avec constructeur)
+            $qrCode = new \Endroid\QrCode\QrCode(
+                data: $url,
+                size: 300,
+                margin: 10
+            );
+
+            $writer = new \Endroid\QrCode\Writer\SvgWriter();
+            $result = $writer->write($qrCode);
+
+            // Retourner en base64
+            return 'data:' . $result->getMimeType() . ';base64,' . base64_encode($result->getString());
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

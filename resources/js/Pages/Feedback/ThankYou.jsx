@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, Star, Heart, Sparkles, ExternalLink } from 'lucide-react';
 
-export default function ThankYou({ rating, googleUrl, company }) {
+export default function ThankYou({ rating, activePlatforms = [], company }) {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -70,41 +70,39 @@ export default function ThankYou({ rating, googleUrl, company }) {
                                 )}
                             </div>
 
-                            {/* Call to action Google */}
-                            {googleUrl && rating >= 4 && (
+                            {/* Plateformes d'avis actives */}
+                            {activePlatforms && activePlatforms.length > 0 && rating > 3 && (
                                 <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-200 mb-8">
                                     <div className="text-center mb-6">
                                         <div className="inline-flex items-center gap-2 mb-3">
                                             <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
-                                            <span className="text-2xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                                            <span className="text-2xl font-black bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
                                                 Vous êtes satisfait !
                                             </span>
                                             <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
                                         </div>
-                                        <p className="text-gray-700 font-medium">
+                                        <p className="text-gray-700 font-medium mb-6">
                                             Partagez votre expérience positive avec la communauté
                                         </p>
                                     </div>
 
-                                    <a
-                                        href={googleUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group relative w-full inline-flex items-center justify-center gap-3 px-8 py-5 overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-2xl"
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600"></div>
-                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div className="absolute inset-0 bg-white opacity-0 group-active:opacity-20 transition-opacity"></div>
-                                        
-                                        <Star className="relative w-6 h-6 text-white fill-white" />
-                                        <span className="relative text-lg font-bold text-white">Laisser un avis sur Google</span>
-                                        <ExternalLink className="relative w-5 h-5 text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                    </a>
-
-                                    <p className="text-center text-sm text-gray-500 mt-4 flex items-center justify-center gap-2">
-                                        <Sparkles className="w-4 h-4" />
-                                        Seulement 1 minute pour faire la différence
-                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {activePlatforms.map((platform, index) => (
+                                            <a
+                                                key={index}
+                                                href={platform.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group relative flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-900 hover:shadow-lg transition-all"
+                                            >
+                                                <Star className="w-5 h-5 text-blue-900 fill-blue-900" />
+                                                <span className="text-base font-bold text-gray-900 group-hover:text-blue-900 transition-colors">
+                                                    Avis sur {platform.name}
+                                                </span>
+                                                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-900 transition-colors" />
+                                            </a>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
