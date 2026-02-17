@@ -66,7 +66,7 @@ class CustomerController extends Controller
     {
         return Inertia::render('Customers/Create');
     }
-
+  
     /**
      * Ajouter un customer manuel.
      */
